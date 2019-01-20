@@ -16,6 +16,7 @@
 		F44557BB21EFEA0C008FD227 /* liblibimagequant.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F44557BA21EFEA0C008FD227 /* liblibimagequant.a */; };
 		F450F69A21F28D67006B13B1 /* Compressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F450F69921F28D67006B13B1 /* Compressor.swift */; };
 		F471B14A21F1CA7000005AA9 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F471B14921F1CA7000005AA9 /* Helpers.swift */; };
+		F478127621F495EC00EAE87F /* libmediancut-posterizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F478127521F495EC00EAE87F /* libmediancut-posterizer.a */; };
 		F4FE1CF621F13349008C8C89 /* liblodepng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4FE1CF521F13349008C8C89 /* liblodepng.a */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +35,7 @@
 		F44557BC21EFEAE5008FD227 /* TheQuantizer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TheQuantizer-Bridging-Header.h"; sourceTree = "<group>"; };
 		F450F69921F28D67006B13B1 /* Compressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compressor.swift; sourceTree = "<group>"; };
 		F471B14921F1CA7000005AA9 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		F478127521F495EC00EAE87F /* libmediancut-posterizer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmediancut-posterizer.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4FE1CF521F13349008C8C89 /* liblodepng.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = liblodepng.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -43,6 +45,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F44557BB21EFEA0C008FD227 /* liblibimagequant.a in Frameworks */,
+				F478127621F495EC00EAE87F /* libmediancut-posterizer.a in Frameworks */,
 				F4FE1CF621F13349008C8C89 /* liblodepng.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -91,6 +94,7 @@
 			children = (
 				F44557BA21EFEA0C008FD227 /* liblibimagequant.a */,
 				F4FE1CF521F13349008C8C89 /* liblodepng.a */,
+				F478127521F495EC00EAE87F /* libmediancut-posterizer.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

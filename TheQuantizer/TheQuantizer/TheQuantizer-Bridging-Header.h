@@ -5,3 +5,4 @@
 
 #include <libimagequant/libimagequant.h>
 #include <lodepng/lodepng.h>
+#include <posterizer/posterizer.h>

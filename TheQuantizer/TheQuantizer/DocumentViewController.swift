@@ -147,18 +147,31 @@ class DocumentViewController: NSViewController {
 		}
 		let optionId = algo3Button.state == .on ? 3 : (algo2Button.state == .on ? 2 : 1)
 		let ditheringEnabled =  ditheredCheck!.state == .on
+		
 		print("Running option \(optionId), with \(colorsCount) colors and \(ditheringEnabled ? "" : "no ")dithering")
 		
 		progressIndicator.startAnimation(self)
 		
 		DispatchQueue.global(qos: .background).async {
+			var compressedImg : CompressedImage? = nil
 			
+			switch optionId {
+			case 1:
+				compressedImg = PngQuantCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
+				break
+			case 2:
+				compressedImg = PosterizerCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
+				break
+			case 3:
+				//compressedImg = BlurizerCompresser.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
+				break
+			default:
+				break
+			}
 			
-			if let newImg = PngQuantCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled){
+			if let newImg = compressedImg {
 				
 				let pc = Int(round((Double(self.document.originalSize) - Double(newImg.size))/Double(self.document.originalSize) * 100))
-				
-				
 				
 				let data = Data(bytes: newImg.data, count: newImg.size)
 				
@@ -167,7 +180,10 @@ class DocumentViewController: NSViewController {
 				tempPath.appendPathComponent(pathComponent)
 				try? data.write(to: tempPath)
 				self.document.newImage = NSImage(contentsOf: tempPath)
+				self.document.newData = data
 				try? FileManager.default.removeItem(at: tempPath)
+				
+				
 				
 				DispatchQueue.main.async {
 					self.infoLabel.cell!.stringValue = self.document.displayName + ": \(newImg.size) bytes (saved \(pc)% of \(self.document.originalSize) bytes)"

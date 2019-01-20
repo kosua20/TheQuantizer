@@ -19,6 +19,7 @@ class ImageDocument: NSDocument {
 	public private(set) var originalSize = 0
 	public private(set) var originalData = UnsafeMutablePointer<UInt8>.allocate(capacity: 1)
 	public var newImage : NSImage? = nil
+	public var newData : Data? = nil
 	
 	override init() {
 	    super.init()

@@ -75,3 +75,45 @@ class PngQuantCompressor {
 	}
 	
 }
+
+class PosterizerCompressor {
+	
+	// Note: blurizer is not provided as it is a preprocess that takes advantage of the rwpng save function, that we don't use.
+	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
+		let bufferCopy = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h*4)
+		for i in 0..<(w*h*4) {
+			bufferCopy[i] = buffer[i]
+		}
+		
+		let maxLevels = min(255, max(2, UInt32(colorCount)))
+		posterizer(bufferCopy, UInt32(w), UInt32(h), maxLevels, 1.0, shouldDither)
+		
+		let output_file_data = UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>.allocate(capacity: 1)
+		var output_file_size : Int = 0
+		lodepng_encode32(output_file_data, &output_file_size, bufferCopy, UInt32(w), UInt32(h))
+		return CompressedImage(buffer: output_file_data.pointee!, bufferSize: output_file_size)
+	}
+	
+}
+
+// Note: blurizer is not provided as it is a preprocess that takes advantage of the rwpng save function, that we don't use.
+/*
+class BlurizerCompresser {
+
+	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
+		
+		let bufferCopy = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h*4)
+		for i in 0..<(w*h*4) {
+			bufferCopy[i] = buffer[i]
+		}
+		
+		let maxLevels = min(255, max(2, UInt32(colorCount)))
+		blurizer(bufferCopy, UInt32(w), UInt32(h), maxLevels, 1.0)
+		
+		let output_file_data = UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>.allocate(capacity: 1)
+		var output_file_size : Int = 0
+		lodepng_encode32(output_file_data, &output_file_size, bufferCopy, UInt32(w), UInt32(h))
+		return CompressedImage(buffer: output_file_data.pointee!, bufferSize: output_file_size)
+	}
+}
+*/
