@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:lodepng/lodepng.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:mediancut-posterizer/mediancut-posterizer.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:TheQuantizer/TheQuantizer.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:libimagequant/libimagequant.xcodeproj">
+   </FileRef>
+</Workspace>

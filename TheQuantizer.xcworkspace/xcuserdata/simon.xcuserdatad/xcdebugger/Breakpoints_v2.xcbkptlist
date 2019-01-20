@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "0"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TheQuantizer/TheQuantizer/Document.swift"
+            timestampString = "569598117.548278"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "makeWindowControllers()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TheQuantizer/TheQuantizer/InteractiveImageView.swift"
+            timestampString = "569673255.19003"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "19"
+            endingLineNumber = "19"
+            landmarkName = "image"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TheQuantizer.DocumentViewController.viewWillAppear() -&gt; ()"
+                  moduleName = "TheQuantizer"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Developer/Xcode/TheQuantizer/TheQuantizer/TheQuantizer/InteractiveImageView.swift"
+                  timestampString = "569671480.9236881"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "19"
+                  endingLineNumber = "19"
+                  offsetFromSymbolStart = "410">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in closure #1 () -&gt; () in TheQuantizer.DocumentViewController.updateCompressedVersion() -&gt; ()"
+                  moduleName = "TheQuantizer"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Developer/Xcode/TheQuantizer/TheQuantizer/TheQuantizer/InteractiveImageView.swift"
+                  timestampString = "569671480.926881"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "19"
+                  endingLineNumber = "19"
+                  offsetFromSymbolStart = "859">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "function signature specialization &lt;Arg[0] = Dead&gt; of TheQuantizer.DocumentViewController.showOriginal(__C.NSButton) -&gt; ()"
+                  moduleName = "TheQuantizer"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Developer/Xcode/TheQuantizer/TheQuantizer/TheQuantizer/InteractiveImageView.swift"
+                  timestampString = "569671480.9296"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "19"
+                  endingLineNumber = "19"
+                  offsetFromSymbolStart = "396">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "function signature specialization &lt;Arg[0] = Dead&gt; of TheQuantizer.DocumentViewController.showOriginal(__C.NSButton) -&gt; ()"
+                  moduleName = "TheQuantizer"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Developer/Xcode/TheQuantizer/TheQuantizer/TheQuantizer/InteractiveImageView.swift"
+                  timestampString = "569671480.932164"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "19"
+                  endingLineNumber = "19"
+                  offsetFromSymbolStart = "699">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TheQuantizer/TheQuantizer/InteractiveImageView.swift"
+            timestampString = "569673255.190446"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "52"
+            endingLineNumber = "52"
+            landmarkName = "setFrameSize(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

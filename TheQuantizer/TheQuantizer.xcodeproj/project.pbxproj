@@ -1,0 +1,375 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F41490CC21F4796B00D1D78C /* InteractiveImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41490CB21F4796B00D1D78C /* InteractiveImageView.swift */; };
+		F445577721EFE7B6008FD227 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445577621EFE7B6008FD227 /* AppDelegate.swift */; };
+		F445577921EFE7B6008FD227 /* DocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445577821EFE7B6008FD227 /* DocumentViewController.swift */; };
+		F445577B21EFE7B6008FD227 /* ImageDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F445577A21EFE7B6008FD227 /* ImageDocument.swift */; };
+		F445577D21EFE7B8008FD227 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F445577C21EFE7B8008FD227 /* Assets.xcassets */; };
+		F445578021EFE7B8008FD227 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F445577E21EFE7B8008FD227 /* Main.storyboard */; };
+		F44557BB21EFEA0C008FD227 /* liblibimagequant.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F44557BA21EFEA0C008FD227 /* liblibimagequant.a */; };
+		F450F69A21F28D67006B13B1 /* Compressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F450F69921F28D67006B13B1 /* Compressor.swift */; };
+		F471B14A21F1CA7000005AA9 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F471B14921F1CA7000005AA9 /* Helpers.swift */; };
+		F4FE1CF621F13349008C8C89 /* liblodepng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4FE1CF521F13349008C8C89 /* liblodepng.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F41490CB21F4796B00D1D78C /* InteractiveImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveImageView.swift; sourceTree = "<group>"; };
+		F41490D521F4867700D1D78C /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = TODO.md; path = ../TODO.md; sourceTree = "<group>"; };
+		F445577321EFE7B6008FD227 /* TheQuantizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TheQuantizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F445577621EFE7B6008FD227 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F445577821EFE7B6008FD227 /* DocumentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewController.swift; sourceTree = "<group>"; };
+		F445577A21EFE7B6008FD227 /* ImageDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDocument.swift; sourceTree = "<group>"; };
+		F445577C21EFE7B8008FD227 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F445577F21EFE7B8008FD227 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		F445578121EFE7B8008FD227 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F445578221EFE7B8008FD227 /* TheQuantizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TheQuantizer.entitlements; sourceTree = "<group>"; };
+		F44557BA21EFEA0C008FD227 /* liblibimagequant.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = liblibimagequant.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F44557BC21EFEAE5008FD227 /* TheQuantizer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TheQuantizer-Bridging-Header.h"; sourceTree = "<group>"; };
+		F450F69921F28D67006B13B1 /* Compressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compressor.swift; sourceTree = "<group>"; };
+		F471B14921F1CA7000005AA9 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		F4FE1CF521F13349008C8C89 /* liblodepng.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = liblodepng.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F445577021EFE7B6008FD227 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F44557BB21EFEA0C008FD227 /* liblibimagequant.a in Frameworks */,
+				F4FE1CF621F13349008C8C89 /* liblodepng.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F445576A21EFE7B6008FD227 = {
+			isa = PBXGroup;
+			children = (
+				F41490D521F4867700D1D78C /* TODO.md */,
+				F445577521EFE7B6008FD227 /* TheQuantizer */,
+				F445577421EFE7B6008FD227 /* Products */,
+				F44557B921EFEA0C008FD227 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		F445577421EFE7B6008FD227 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F445577321EFE7B6008FD227 /* TheQuantizer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F445577521EFE7B6008FD227 /* TheQuantizer */ = {
+			isa = PBXGroup;
+			children = (
+				F445577621EFE7B6008FD227 /* AppDelegate.swift */,
+				F471B14921F1CA7000005AA9 /* Helpers.swift */,
+				F445577821EFE7B6008FD227 /* DocumentViewController.swift */,
+				F450F69921F28D67006B13B1 /* Compressor.swift */,
+				F445577A21EFE7B6008FD227 /* ImageDocument.swift */,
+				F41490CB21F4796B00D1D78C /* InteractiveImageView.swift */,
+				F445577C21EFE7B8008FD227 /* Assets.xcassets */,
+				F445577E21EFE7B8008FD227 /* Main.storyboard */,
+				F445578121EFE7B8008FD227 /* Info.plist */,
+				F445578221EFE7B8008FD227 /* TheQuantizer.entitlements */,
+				F44557BC21EFEAE5008FD227 /* TheQuantizer-Bridging-Header.h */,
+			);
+			path = TheQuantizer;
+			sourceTree = "<group>";
+		};
+		F44557B921EFEA0C008FD227 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F44557BA21EFEA0C008FD227 /* liblibimagequant.a */,
+				F4FE1CF521F13349008C8C89 /* liblodepng.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F445577221EFE7B6008FD227 /* TheQuantizer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F445578521EFE7B8008FD227 /* Build configuration list for PBXNativeTarget "TheQuantizer" */;
+			buildPhases = (
+				F445576F21EFE7B6008FD227 /* Sources */,
+				F445577021EFE7B6008FD227 /* Frameworks */,
+				F445577121EFE7B6008FD227 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TheQuantizer;
+			productName = TheQuantizer;
+			productReference = F445577321EFE7B6008FD227 /* TheQuantizer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F445576B21EFE7B6008FD227 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1010;
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = "Simon Rodriguez";
+				TargetAttributes = {
+					F445577221EFE7B6008FD227 = {
+						CreatedOnToolsVersion = 10.1;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = F445576E21EFE7B6008FD227 /* Build configuration list for PBXProject "TheQuantizer" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F445576A21EFE7B6008FD227;
+			productRefGroup = F445577421EFE7B6008FD227 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F445577221EFE7B6008FD227 /* TheQuantizer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F445577121EFE7B6008FD227 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F445577D21EFE7B8008FD227 /* Assets.xcassets in Resources */,
+				F445578021EFE7B8008FD227 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F445576F21EFE7B6008FD227 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F445577921EFE7B6008FD227 /* DocumentViewController.swift in Sources */,
+				F445577721EFE7B6008FD227 /* AppDelegate.swift in Sources */,
+				F445577B21EFE7B6008FD227 /* ImageDocument.swift in Sources */,
+				F41490CC21F4796B00D1D78C /* InteractiveImageView.swift in Sources */,
+				F450F69A21F28D67006B13B1 /* Compressor.swift in Sources */,
+				F471B14A21F1CA7000005AA9 /* Helpers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		F445577E21EFE7B8008FD227 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F445577F21EFE7B8008FD227 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F445578321EFE7B8008FD227 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F445578421EFE7B8008FD227 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		F445578621EFE7B8008FD227 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = MM696H2U5V;
+				HEADER_SEARCH_PATHS = "/Users/simon/Library/Developer/Xcode/DerivedData/TheQuantizer-fdvdvyaizozvgvatmkongbkuuxuk/Build/Products/Release/include/";
+				INFOPLIST_FILE = TheQuantizer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.simonrodriguez.TheQuantizer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "TheQuantizer/TheQuantizer-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		F445578721EFE7B8008FD227 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = MM696H2U5V;
+				HEADER_SEARCH_PATHS = "/Users/simon/Library/Developer/Xcode/DerivedData/TheQuantizer-fdvdvyaizozvgvatmkongbkuuxuk/Build/Products/Release/include/";
+				INFOPLIST_FILE = TheQuantizer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.simonrodriguez.TheQuantizer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "TheQuantizer/TheQuantizer-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F445576E21EFE7B6008FD227 /* Build configuration list for PBXProject "TheQuantizer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F445578321EFE7B8008FD227 /* Debug */,
+				F445578421EFE7B8008FD227 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F445578521EFE7B8008FD227 /* Build configuration list for PBXNativeTarget "TheQuantizer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F445578621EFE7B8008FD227 /* Debug */,
+				F445578721EFE7B8008FD227 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F445576B21EFE7B6008FD227 /* Project object */;
+}
