@@ -500,39 +500,6 @@
                                             <action selector="scaleSliderChanged:" target="5gI-5U-AMq" id="pJq-BQ-DfS"/>
                                         </connections>
                                     </slider>
-                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bg0-h9-8iZ">
-                                        <rect key="frame" x="521" y="56" width="61" height="18"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="radio" title="Algo 2" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="7JO-jI-dwG">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="algo2ButtonChanged:" target="5gI-5U-AMq" id="Jnb-Yf-YL2"/>
-                                        </connections>
-                                    </button>
-                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j9R-Mw-a6V">
-                                        <rect key="frame" x="519" y="76" width="83" height="18"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="radio" title="PngQuant" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="BPg-wF-wyW">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="algo1ButtonChanged:" target="5gI-5U-AMq" id="R2F-ad-yr8"/>
-                                        </connections>
-                                    </button>
-                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rhx-JD-EM7">
-                                        <rect key="frame" x="523" y="41" width="76" height="18"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="radio" title="Algo 3" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="bVo-NB-aDM">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="algo3ButtonChanged:" target="5gI-5U-AMq" id="VVx-pP-jGb"/>
-                                        </connections>
-                                    </button>
                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="h7x-lw-YIu">
                                         <rect key="frame" x="381" y="50" width="75" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -543,14 +510,6 @@
                                         <connections>
                                             <action selector="ditheredCheckChanged:" target="5gI-5U-AMq" id="7Ao-3i-SwV"/>
                                         </connections>
-                                    </button>
-                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zdD-IR-JIF">
-                                        <rect key="frame" x="381" y="27" width="76" height="18"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="check" title="No alpha" bezelStyle="regularSquare" imagePosition="left" inset="2" id="xXf-yY-vVM">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
                                     </button>
                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lA6-9K-Xs4">
                                         <rect key="frame" x="393" y="0.0" width="90" height="22"/>
@@ -600,14 +559,19 @@
                                             <font key="font" metaFont="menu"/>
                                             <menu key="menu" id="LPl-i4-lax">
                                                 <items>
-                                                    <menuItem title="PngQuant 2" state="on" id="9Kb-HI-h0m"/>
-                                                    <menuItem title="Posterizer" id="X4B-Mj-T5q">
+                                                    <menuItem title="PngQuant 2" state="on" id="9Kb-HI-h0m">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                     </menuItem>
-                                                    <menuItem title="Blurizer" id="Ml5-0G-ufQ"/>
+                                                    <menuItem title="Posterizer" tag="1" id="X4B-Mj-T5q">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    </menuItem>
+                                                    <menuItem title="PngNQ" tag="2" id="Ml5-0G-ufQ"/>
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
+                                        <connections>
+                                            <action selector="methodMenuChanged:" target="5gI-5U-AMq" id="dzo-p0-lSX"/>
+                                        </connections>
                                     </popUpButton>
                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="98b-mO-otw">
                                         <rect key="frame" x="243" y="21" width="122" height="19"/>
@@ -669,9 +633,6 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="algo1Button" destination="j9R-Mw-a6V" id="6s0-7n-IZF"/>
-                        <outlet property="algo2Button" destination="Bg0-h9-8iZ" id="iQW-aU-MSm"/>
-                        <outlet property="algo3Button" destination="rhx-JD-EM7" id="sHK-PX-w2g"/>
                         <outlet property="backgroundLabel" destination="6yf-yX-vCI" id="w0b-KR-02f"/>
                         <outlet property="colorsLabel" destination="IGO-aK-dht" id="CzE-Dw-zBO"/>
                         <outlet property="colorsSlider" destination="mav-at-wMR" id="onc-2f-tSv"/>

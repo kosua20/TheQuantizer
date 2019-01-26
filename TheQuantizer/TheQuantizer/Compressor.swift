@@ -69,12 +69,14 @@ class PngQuantCompressor : Compressor {
 		if (out_status != 0) {
 			return nil
 		}
-		// TODO: free
+		
 		liq_result_destroy(quantization_result.pointee!) // Must be freed only after you're done using the palette
 		liq_image_destroy(input_image)
 		liq_attr_destroy(handle)
 		lodepng_state_cleanup(state)
 		
+		quantization_result.deallocate()
+		raw_8bit_pixels.deallocate()
 		return CompressedImage(buffer: output_file_data.pointee!, bufferSize: output_file_size)
 	}
 	
@@ -140,12 +142,7 @@ class PngQCompressor : Compressor {
 		state.pointee.info_png.color.colortype = LCT_PALETTE
 		state.pointee.info_png.color.bitdepth = 8
 		
-		// Build array from tuple.
-		//l = populatePalette(palette: palette.pointee)
-		//rwpng_info.palette[remap[x]].red  = map[x][0];
-		//	//		rwpng_info.palette[remap[x]].green = map[x][1];
-		//	//		rwpng_info.palette[remap[x]].blue = map[x][2];
-		//	//		rwpng_info.trans[remap[x]] = map[x][3];
+		
 		var invRemap = [Int](repeating: 0, count: Int(MAXNETSIZE))
 		for rid in 0..<colorCountBounded {
 			invRemap[Int(remap[rid])] = rid
@@ -157,21 +154,17 @@ class PngQCompressor : Compressor {
 			lodepng_palette_add(&(state.pointee.info_png.color), map[4*lid+0], map[4*lid+1], map[4*lid+2], map[4*lid+3])
 			lodepng_palette_add(&(state.pointee.info_raw), map[4*lid+0], map[4*lid+1], map[4*lid+2], map[4*lid+3])
 		}
-			
 		
-		
-
-
 		let output_file_data = UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>.allocate(capacity: 1)
 		var output_file_size : Int = 0
-		let out_status = lodepng_encode(output_file_data, &output_file_size, indexedData, UInt32(w), UInt32(h), state)
-
-		if (out_status != 0) {
-			return nil
-		}
-
+		lodepng_encode(output_file_data, &output_file_size, indexedData, UInt32(w), UInt32(h), state)
 
 		lodepng_state_cleanup(state)
+		remap.deallocate()
+		map.deallocate()
+		indexedData.deallocate()
+		bufferC.deallocate()
+		
 		return CompressedImage(buffer: output_file_data.pointee!, bufferSize: output_file_size)
 	
 	}
@@ -193,6 +186,7 @@ class PosterizerCompressor : Compressor {
 		let output_file_data = UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>.allocate(capacity: 1)
 		var output_file_size : Int = 0
 		lodepng_encode32(output_file_data, &output_file_size, bufferCopy, UInt32(w), UInt32(h))
+		bufferCopy.deallocate()
 		return CompressedImage(buffer: output_file_data.pointee!, bufferSize: output_file_size)
 	}
 	

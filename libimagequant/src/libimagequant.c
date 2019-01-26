@@ -13,7 +13,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <limits.h>
-#include <lodepng/lodepng.h>
 
 #if !(defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199900L) && !(defined(_MSC_VER) && _MSC_VER >= 1800)
 #error "This program requires C99, e.g. -std=c99 switch in GCC or it requires MSVC 18.0 or higher."

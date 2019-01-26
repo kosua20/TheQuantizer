@@ -7,7 +7,6 @@
 * interpolation modes
 * scrolling to zoom
 * click+drag to pan
-* more algorithms
 
 ### Technical
 

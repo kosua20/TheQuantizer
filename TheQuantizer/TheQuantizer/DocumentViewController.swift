@@ -55,24 +55,9 @@ class DocumentViewController: NSViewController {
 	}
 	
 	// Algorithms.
-	
-	@IBOutlet weak var algo1Button: NSButton!
-	@IBOutlet weak var algo2Button: NSButton!
-	@IBOutlet weak var algo3Button: NSButton!
-	
-	@IBAction func algo1ButtonChanged(_ sender: NSButton) {
-		algo2Button.state = .off
-		algo3Button.state = .off
-		updateCompressedVersion()
-	}
-	@IBAction func algo2ButtonChanged(_ sender: NSButton) {
-		algo1Button.state = .off
-		algo3Button.state = .off
-		updateCompressedVersion()
-	}
-	@IBAction func algo3ButtonChanged(_ sender: NSButton) {
-		algo2Button.state = .off
-		algo1Button.state = .off
+	private var optionId = 0
+	@IBAction func methodMenuChanged(_ sender: NSPopUpButton) {
+		optionId = sender.selectedTag()
 		updateCompressedVersion()
 	}
 	
@@ -122,7 +107,6 @@ class DocumentViewController: NSViewController {
 		infoLabel.cell!.stringValue = "No image loaded."
 		let filter = NSEvent.EventTypeMask.leftMouseDown.union(.leftMouseUp)
 		showOriginalButton.cell!.sendAction(on: filter)
-		algo1Button.state = .on
 	}
 	
 	
@@ -149,7 +133,7 @@ class DocumentViewController: NSViewController {
 			return
 		}
 		
-		let optionId = algo3Button.state == .on ? 3 : (algo2Button.state == .on ? 2 : 1)
+		
 		let ditheringEnabled =  ditheredCheck!.state == .on
 		
 		//print("Running option \(optionId), with \(colorsCount) colors and \(ditheringEnabled ? "" : "no ")dithering")
@@ -165,14 +149,14 @@ class DocumentViewController: NSViewController {
 			// Do the stuuuuff.
 			var compressedImg : CompressedImage? = nil
 			
-			switch optionId {
-			case 1:
+			switch self.optionId {
+			case 0:
 				compressedImg = PngQuantCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
-			case 2:
+			case 1:
 				compressedImg = PosterizerCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
-			case 3:
+			case 2:
 				compressedImg = PngQCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
 			default:
@@ -186,6 +170,7 @@ class DocumentViewController: NSViewController {
 				let pc = Int(round((Double(self.document.originalSize) - Double(newImg.size))/Double(self.document.originalSize) * 100))
 				
 				let data = Data(bytes: newImg.data, count: newImg.size)
+				newImg.data.deallocate()
 				
 				let pathComponent = self.document.displayName + UUID().uuidString + ".png"
 				var tempPath = URL(fileURLWithPath: NSTemporaryDirectory())
