@@ -440,7 +440,7 @@
                                     <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mav-at-wMR">
                                         <rect key="frame" x="10" y="42" width="191" height="24"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="1" maxValue="8" doubleValue="8" tickMarkPosition="below" numberOfTickMarks="8" allowsTickMarkValuesOnly="YES" sliderType="linear" id="W7j-SX-leW"/>
+                                        <sliderCell key="cell" state="on" alignment="left" minValue="1" maxValue="8" doubleValue="8" tickMarkPosition="below" numberOfTickMarks="8" allowsTickMarkValuesOnly="YES" sliderType="linear" id="W7j-SX-leW"/>
                                         <connections>
                                             <action selector="colorsSliderChanged:" target="5gI-5U-AMq" id="UtG-cd-XzI"/>
                                         </connections>

@@ -36,6 +36,19 @@ extension NSImage {
 		let rawData = UnsafeMutablePointer<UInt8>.allocate(capacity: 4 * height * width * MemoryLayout<UInt8>.size)
 		let ctx = CGContext(data: rawData, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width*4, space: space, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
 		ctx.draw(baseImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+		
+		// De-alpha-premultiply.
+		for i in 0..<height {
+			for j in 0..<width {
+				let baseIndex = 4*(width*i+j)
+				let alpha = Float(rawData[baseIndex + 3])/255.0
+				if alpha > 0 {
+					rawData[baseIndex + 0] = UInt8(Float(rawData[baseIndex + 0]) / alpha)
+					rawData[baseIndex + 1] = UInt8(Float(rawData[baseIndex + 1]) / alpha)
+					rawData[baseIndex + 2] = UInt8(Float(rawData[baseIndex + 2]) / alpha)
+				}
+			}
+		}
 		return rawData
 	}
 }

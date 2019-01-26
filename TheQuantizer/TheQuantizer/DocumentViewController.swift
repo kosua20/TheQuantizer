@@ -141,18 +141,28 @@ class DocumentViewController: NSViewController {
 		}
 	}
 	
+	
+	private let semaphore = DispatchSemaphore(value: 1)
+	
 	func updateCompressedVersion(){
 		guard let originalImg = document.originalImage else {
 			return
 		}
+		
 		let optionId = algo3Button.state == .on ? 3 : (algo2Button.state == .on ? 2 : 1)
 		let ditheringEnabled =  ditheredCheck!.state == .on
 		
-		print("Running option \(optionId), with \(colorsCount) colors and \(ditheringEnabled ? "" : "no ")dithering")
-		
-		progressIndicator.startAnimation(self)
-		
-		DispatchQueue.global(qos: .background).async {
+		//print("Running option \(optionId), with \(colorsCount) colors and \(ditheringEnabled ? "" : "no ")dithering")
+		DispatchQueue.global(qos: .userInitiated ).async {
+			// Wait for the compressors to be available.
+			self.semaphore.wait()
+			
+			// Start animation.
+			DispatchQueue.main.async {
+				self.progressIndicator.startAnimation(self)
+			}
+			
+			// Do the stuuuuff.
 			var compressedImg : CompressedImage? = nil
 			
 			switch optionId {
@@ -163,14 +173,16 @@ class DocumentViewController: NSViewController {
 				compressedImg = PosterizerCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
 			case 3:
-				//compressedImg = BlurizerCompresser.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
+				compressedImg = PngQCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
 			default:
 				break
 			}
 			
+			// If the compression succeeded
 			if let newImg = compressedImg {
 				
+				// Compute size gain, write file to disk.
 				let pc = Int(round((Double(self.document.originalSize) - Double(newImg.size))/Double(self.document.originalSize) * 100))
 				
 				let data = Data(bytes: newImg.data, count: newImg.size)
@@ -184,26 +196,26 @@ class DocumentViewController: NSViewController {
 				try? FileManager.default.removeItem(at: tempPath)
 				
 				
-				
+				// Update GUI.
 				DispatchQueue.main.async {
 					self.infoLabel.cell!.stringValue = self.document.displayName + ": \(newImg.size) bytes (saved \(pc)% of \(self.document.originalSize) bytes)"
 					self.imageView.image = self.document.newImage
-					
-					
+					self.progressIndicator.stopAnimation(self)
+					// Release the compressors.
+					self.semaphore.signal()
+				}
+			} else {
+				// Else just stop.
+				DispatchQueue.main.async {
+					self.progressIndicator.stopAnimation(self)
+					self.semaphore.signal()
 				}
 			}
 			
-			DispatchQueue.main.async {
-				self.progressIndicator.stopAnimation(self)
-			}
+			
 		}
 		
-		
-		
-		
 	}
-	
-	
 	
 
 	override var representedObject: Any? {

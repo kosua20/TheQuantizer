@@ -17,6 +17,7 @@
 		F450F69A21F28D67006B13B1 /* Compressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F450F69921F28D67006B13B1 /* Compressor.swift */; };
 		F471B14A21F1CA7000005AA9 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F471B14921F1CA7000005AA9 /* Helpers.swift */; };
 		F478127621F495EC00EAE87F /* libmediancut-posterizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F478127521F495EC00EAE87F /* libmediancut-posterizer.a */; };
+		F4FD06DE21F5BDFC00F5C6DB /* libpngnq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4FD06DD21F5BDFC00F5C6DB /* libpngnq.a */; };
 		F4FE1CF621F13349008C8C89 /* liblodepng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4FE1CF521F13349008C8C89 /* liblodepng.a */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,8 @@
 		F450F69921F28D67006B13B1 /* Compressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compressor.swift; sourceTree = "<group>"; };
 		F471B14921F1CA7000005AA9 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		F478127521F495EC00EAE87F /* libmediancut-posterizer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmediancut-posterizer.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4FD06DB21F5BD2000F5C6DB /* libpngq.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libpngq.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4FD06DD21F5BDFC00F5C6DB /* libpngnq.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libpngnq.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4FE1CF521F13349008C8C89 /* liblodepng.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = liblodepng.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -45,6 +48,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F44557BB21EFEA0C008FD227 /* liblibimagequant.a in Frameworks */,
+				F4FD06DE21F5BDFC00F5C6DB /* libpngnq.a in Frameworks */,
 				F478127621F495EC00EAE87F /* libmediancut-posterizer.a in Frameworks */,
 				F4FE1CF621F13349008C8C89 /* liblodepng.a in Frameworks */,
 			);
@@ -94,7 +98,9 @@
 			children = (
 				F44557BA21EFEA0C008FD227 /* liblibimagequant.a */,
 				F4FE1CF521F13349008C8C89 /* liblodepng.a */,
+				F4FD06DD21F5BDFC00F5C6DB /* libpngnq.a */,
 				F478127521F495EC00EAE87F /* libmediancut-posterizer.a */,
+				F4FD06DB21F5BD2000F5C6DB /* libpngq.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

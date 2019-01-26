@@ -20,7 +20,11 @@ class CompressedImage {
 	
 }
 
-class PngQuantCompressor {
+protocol Compressor {
+	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage?
+}
+
+class PngQuantCompressor : Compressor {
 	
 	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
 		let colorCountBounded = min(256, max(2, colorCount))
@@ -76,9 +80,107 @@ class PngQuantCompressor {
 	
 }
 
-class PosterizerCompressor {
+
+
+class PngQCompressor : Compressor {
 	
-	// Note: blurizer is not provided as it is a preprocess that takes advantage of the rwpng save function, that we don't use.
+	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
+		
+		// Duplicate buffer.
+		let bufferC = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h*4)
+		for i in 0..<w*h*4 {
+			bufferC[i] = buffer[i]
+		}
+		
+		let colorCountBounded = min(256, max(2, colorCount))
+		let gamma = 1.0
+		let cols = UInt32(w)
+		let rows = UInt32(h)
+		let sampleFactor = min(Int(1 + Double(w*h)/(512.0*512)), 10)
+		
+		initnet(bufferC, cols*rows*4, UInt32(colorCountBounded), gamma)
+		learn(UInt32(sampleFactor), 0)
+		inxbuild()
+		
+		
+		let map = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(MAXNETSIZE)*4)
+		getcolormap(map)
+		
+		let remap = UnsafeMutablePointer<UInt32>.allocate(capacity: Int(MAXNETSIZE))
+		var botIdx : UInt32 = 0
+		var topIdx : Int32 = Int32(colorCount)-1
+		/* Remap indexes so all tRNS chunks are together */
+		for x in 0..<colorCountBounded {
+			if map[4*x+3] == 255 {
+				remap[x] = UInt32(topIdx)
+				topIdx -= 1
+			} else {
+				remap[x] = botIdx
+				botIdx += 1
+			}
+			remap[x] = UInt32(x)
+		}
+		if(botIdx != topIdx + 1){
+			print("Fishy")
+			return nil
+		}
+		
+		let indexedData = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h)
+		
+		if shouldDither {
+			remap_floyd(bufferC, cols, rows, map, remap, indexedData, 1)
+		} else {
+			remap_simple(bufferC, cols, rows, remap, indexedData)
+		}
+		
+		let state = UnsafeMutablePointer<LodePNGState>.allocate(capacity: 1)
+		lodepng_state_init(state)
+		state.pointee.info_raw.colortype = LCT_PALETTE
+		state.pointee.info_raw.bitdepth = 8
+		state.pointee.info_png.color.colortype = LCT_PALETTE
+		state.pointee.info_png.color.bitdepth = 8
+		
+		// Build array from tuple.
+		//l = populatePalette(palette: palette.pointee)
+		//rwpng_info.palette[remap[x]].red  = map[x][0];
+		//	//		rwpng_info.palette[remap[x]].green = map[x][1];
+		//	//		rwpng_info.palette[remap[x]].blue = map[x][2];
+		//	//		rwpng_info.trans[remap[x]] = map[x][3];
+		var invRemap = [Int](repeating: 0, count: Int(MAXNETSIZE))
+		for rid in 0..<colorCountBounded {
+			invRemap[Int(remap[rid])] = rid
+		}
+		
+		for i in 0..<colorCountBounded {
+			// Find the index in remap.
+			let lid = invRemap[i]
+			lodepng_palette_add(&(state.pointee.info_png.color), map[4*lid+0], map[4*lid+1], map[4*lid+2], map[4*lid+3])
+			lodepng_palette_add(&(state.pointee.info_raw), map[4*lid+0], map[4*lid+1], map[4*lid+2], map[4*lid+3])
+		}
+			
+		
+		
+
+
+		let output_file_data = UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>.allocate(capacity: 1)
+		var output_file_size : Int = 0
+		let out_status = lodepng_encode(output_file_data, &output_file_size, indexedData, UInt32(w), UInt32(h), state)
+
+		if (out_status != 0) {
+			return nil
+		}
+
+
+		lodepng_state_cleanup(state)
+		return CompressedImage(buffer: output_file_data.pointee!, bufferSize: output_file_size)
+	
+	}
+	
+}
+
+class PosterizerCompressor : Compressor {
+	
+	
 	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
 		let bufferCopy = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h*4)
 		for i in 0..<(w*h*4) {
@@ -98,7 +200,7 @@ class PosterizerCompressor {
 
 // Note: blurizer is not provided as it is a preprocess that takes advantage of the rwpng save function, that we don't use.
 /*
-class BlurizerCompresser {
+class BlurizerCompresser : Compressor {
 
 	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
 		

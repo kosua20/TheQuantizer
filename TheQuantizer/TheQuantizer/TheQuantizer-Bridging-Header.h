@@ -6,3 +6,5 @@
 #include <libimagequant/libimagequant.h>
 #include <lodepng/lodepng.h>
 #include <posterizer/posterizer.h>
+#include <pngnq/neuquant32.h>
+#include <pngnq/pngnq.h>
