@@ -11,7 +11,9 @@ import Cocoa
 
 
 
-class DocumentViewController: NSViewController {
+class DocumentViewController: NSViewController, ImageLoaderDelegate {
+	
+	
 
 	
 	
@@ -54,6 +56,10 @@ class DocumentViewController: NSViewController {
 		updateCompressedVersion()
 	}
 	
+	@IBOutlet weak var noAlphaCheck: NSButton!
+	@IBAction func noAlphaChecked(_ sender: NSButton) {
+		updateCompressedVersion()
+	}
 	// Algorithms.
 	private var optionId = 0
 	@IBAction func methodMenuChanged(_ sender: NSPopUpButton) {
@@ -65,7 +71,7 @@ class DocumentViewController: NSViewController {
 	
 	@IBOutlet weak var smoothingCheck: NSButton!
 	@IBAction func smoothingCheckChanged(_ sender: NSButton) {
-		
+		//imag
 	}
 	
 	@IBOutlet weak var scaleSlider: NSSlider!
@@ -107,10 +113,12 @@ class DocumentViewController: NSViewController {
 		infoLabel.cell!.stringValue = "No image loaded."
 		let filter = NSEvent.EventTypeMask.leftMouseDown.union(.leftMouseUp)
 		showOriginalButton.cell!.sendAction(on: filter)
+		imageView.delegate = self
 	}
 	
 	
 	private var document = ImageDocument()
+	
 	
 	override func viewWillAppear() {
 		if let aDocument = self.view.window?.windowController?.document as? ImageDocument {
@@ -125,6 +133,10 @@ class DocumentViewController: NSViewController {
 		}
 	}
 	
+	func loadItem(at path: URL) {
+		NSDocumentController.shared.openDocument(withContentsOf: path, display: true, completionHandler: {_,_,_ in })
+	}
+	
 	
 	private let semaphore = DispatchSemaphore(value: 1)
 	
@@ -134,10 +146,10 @@ class DocumentViewController: NSViewController {
 		}
 		
 		
-		let ditheringEnabled =  ditheredCheck!.state == .on
+		let ditheringEnabled = ditheredCheck!.state == .on
+		let noAlphaEnabled = noAlphaCheck!.state == .on
 		
-		//print("Running option \(optionId), with \(colorsCount) colors and \(ditheringEnabled ? "" : "no ")dithering")
-		DispatchQueue.global(qos: .userInitiated ).async {
+		DispatchQueue.global(qos: .userInteractive ).async {
 			// Wait for the compressors to be available.
 			self.semaphore.wait()
 			
@@ -146,22 +158,37 @@ class DocumentViewController: NSViewController {
 				self.progressIndicator.startAnimation(self)
 			}
 			
+			
+			
+			let w = Int(originalImg.size.width)
+			let h = Int(originalImg.size.height)
+			// Duplicate buffer.
+			let bufferCopy = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h*4)
+			for i in 0..<w*h {
+				let baseInd = 4*i
+				bufferCopy[baseInd+0] = self.document.originalData[baseInd+0]
+				bufferCopy[baseInd+1] = self.document.originalData[baseInd+1]
+				bufferCopy[baseInd+2] = self.document.originalData[baseInd+2]
+				bufferCopy[baseInd+3] = noAlphaEnabled ? 255 : self.document.originalData[baseInd+3]
+			}
+			
 			// Do the stuuuuff.
 			var compressedImg : CompressedImage? = nil
-			
 			switch self.optionId {
 			case 0:
-				compressedImg = PngQuantCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
+				compressedImg = PngQuantCompressor.compress(buffer: bufferCopy, w: w, h: h, colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
 			case 1:
-				compressedImg = PosterizerCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
+				compressedImg = PosterizerCompressor.compress(buffer: bufferCopy, w: w, h: h, colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
 			case 2:
-				compressedImg = PngQCompressor.compress(buffer: self.document.originalData, w: Int(originalImg.size.width), h: Int(originalImg.size.height), colorCount: self.colorsCount, shouldDither: ditheringEnabled)
+				compressedImg = PngQCompressor.compress(buffer: bufferCopy, w: w, h: h, colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
 			default:
 				break
 			}
+			
+			bufferCopy.deallocate()
 			
 			// If the compression succeeded
 			if let newImg = compressedImg {

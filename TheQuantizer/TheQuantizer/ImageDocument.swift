@@ -53,6 +53,8 @@ class ImageDocument: NSDocument {
 			originalImage = img
 			originalSize = data.count
 			originalData = img.rgbaRepresentation()
+		} else {
+			throw InvalidFileError()
 		}
 		
 	}

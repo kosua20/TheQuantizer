@@ -2,7 +2,6 @@
 ## To do
 ### Functionalities
 
-* drag and drop to load
 * export result image
 * interpolation modes
 * scrolling to zoom

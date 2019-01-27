@@ -8,8 +8,14 @@
 
 import Cocoa
 
-class InteractiveImageView: NSView {
+protocol ImageLoaderDelegate : class {
+	func loadItem(at: URL)
+}
 
+class InteractiveImageView: NSView {
+	
+	public weak var delegate : ImageLoaderDelegate?
+	
 	public var image: NSImage? {
 		didSet {
 			if let img = image {
@@ -48,18 +54,47 @@ class InteractiveImageView: NSView {
 	
 	override func setFrameSize(_ newSize: NSSize) {
 		super.setFrameSize(newSize)
-		print("bup")
 		updateImageFrame()
 	}
 	
 	
 	func setupLayers(){
+		registerForDraggedTypes([.URL])
+		
 		updateImageFrame()
 		self.wantsLayer = true
 		self.layer = CALayer()
 		self.layer!.addSublayer(imageLayer)
 	}
 	
+	
+	private let filteringOptions = [NSPasteboard.ReadingOptionKey.urlReadingContentsConformToTypes: NSImage.imageTypes]
+	
+	func allowDragOperation(info: NSDraggingInfo) -> Bool {
+		let pasteBoard = info.draggingPasteboard
+		
+		if pasteBoard.canReadObject(forClasses: [NSURL.self], options: filteringOptions) {
+			return true
+		}
+		return false
+	}
+	
+	override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+		return allowDragOperation(info: sender) ? .copy : NSDragOperation()
+	}
+	
+	override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
+		return allowDragOperation(info: sender)
+	}
+	
+	override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+		let pasteBoard = sender.draggingPasteboard
+		if let urls = pasteBoard.readObjects(forClasses: [NSURL.self], options:filteringOptions) as? [URL], urls.count > 0 {
+			delegate?.loadItem(at: urls.first!)
+			return true
+		}
+		return false
+	}
 	
 	func updateImageFrame(){
 		guard let _ = image else {

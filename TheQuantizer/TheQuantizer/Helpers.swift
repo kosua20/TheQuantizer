@@ -26,7 +26,7 @@ class InvalidFileError : NSError {
 extension NSImage {
 	
 	func rgbaRepresentation() -> UnsafeMutablePointer<UInt8> {
-		let baseImage = self.cgImage(forProposedRect: nil, context: nil, hints: [:])!
+		//let baseImage = self.cgImage(forProposedRect: nil, context: nil, hints: [:])!
 		
 		
 		let width = Int(self.size.width)
@@ -34,21 +34,45 @@ extension NSImage {
 		
 		let space = CGColorSpaceCreateDeviceRGB()
 		let rawData = UnsafeMutablePointer<UInt8>.allocate(capacity: 4 * height * width * MemoryLayout<UInt8>.size)
-		let ctx = CGContext(data: rawData, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width*4, space: space, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-		ctx.draw(baseImage, in: CGRect(x: 0, y: 0, width: width, height: height))
 		
-		// De-alpha-premultiply.
-		for i in 0..<height {
-			for j in 0..<width {
-				let baseIndex = 4*(width*i+j)
-				let alpha = Float(rawData[baseIndex + 3])/255.0
+		let ctx = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4*width, space: space, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGImageByteOrderInfo.order32Big.rawValue)!
+		let nsctx = NSGraphicsContext(cgContext: ctx, flipped: false)
+		NSGraphicsContext.current = nsctx
+		self.draw(in: NSRect(x: 0, y: 0, width: width, height: height))
+		
+		let dataPtr = ctx.data!.bindMemory(to: UInt32.self, capacity: width*height)
+		
+		for y in 0..<height {
+			for x in 0..<width {
+				let rawCol = dataPtr[y*width+x]
+				let alpha = Float((rawCol & 0xff000000) >> 24)/255.0
 				if alpha > 0 {
-					rawData[baseIndex + 0] = UInt8(Float(rawData[baseIndex + 0]) / alpha)
-					rawData[baseIndex + 1] = UInt8(Float(rawData[baseIndex + 1]) / alpha)
-					rawData[baseIndex + 2] = UInt8(Float(rawData[baseIndex + 2]) / alpha)
+					rawData[4*(y*width+x) + 0] = UInt8(Float((rawCol & 0x000000ff) >> 0 ) / alpha)
+					rawData[4*(y*width+x) + 1] = UInt8(Float((rawCol & 0x0000ff00) >> 8 ) / alpha)
+					rawData[4*(y*width+x) + 2] = UInt8(Float((rawCol & 0x00ff0000) >> 16) / alpha)
+					rawData[4*(y*width+x) + 3] = UInt8(alpha*255)
+				} else {
+					rawData[4*(y*width+x) + 0] = 0
+					rawData[4*(y*width+x) + 1] = 0
+					rawData[4*(y*width+x) + 2] = 0
+					rawData[4*(y*width+x) + 3] = 0
 				}
+				
 			}
 		}
+		
+		// De-alpha-premultiply.
+//		for i in 0..<height {
+//			for j in 0..<width {
+//				let baseIndex = 4*(width*i+j)
+//				let alpha = Float(rawData[baseIndex + 3])/255.0
+//				if alpha > 0 {
+//					rawData[baseIndex + 0] = UInt8(Float(rawData[baseIndex + 0]) / alpha)
+//					rawData[baseIndex + 1] = UInt8(Float(rawData[baseIndex + 1]) / alpha)
+//					rawData[baseIndex + 2] = UInt8(Float(rawData[baseIndex + 2]) / alpha)
+//				}
+//			}
+//		}
 		return rawData
 	}
 }

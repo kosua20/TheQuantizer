@@ -88,11 +88,7 @@ class PngQCompressor : Compressor {
 	
 	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
 		
-		// Duplicate buffer.
-		let bufferC = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h*4)
-		for i in 0..<w*h*4 {
-			bufferC[i] = buffer[i]
-		}
+		
 		
 		let colorCountBounded = min(256, max(2, colorCount))
 		let gamma = 1.0
@@ -100,7 +96,7 @@ class PngQCompressor : Compressor {
 		let rows = UInt32(h)
 		let sampleFactor = min(Int(1 + Double(w*h)/(512.0*512)), 10)
 		
-		initnet(bufferC, cols*rows*4, UInt32(colorCountBounded), gamma)
+		initnet(buffer, cols*rows*4, UInt32(colorCountBounded), gamma)
 		learn(UInt32(sampleFactor), 0)
 		inxbuild()
 		
@@ -130,9 +126,9 @@ class PngQCompressor : Compressor {
 		let indexedData = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h)
 		
 		if shouldDither {
-			remap_floyd(bufferC, cols, rows, map, remap, indexedData, 1)
+			remap_floyd(buffer, cols, rows, map, remap, indexedData, 1)
 		} else {
-			remap_simple(bufferC, cols, rows, remap, indexedData)
+			remap_simple(buffer, cols, rows, remap, indexedData)
 		}
 		
 		let state = UnsafeMutablePointer<LodePNGState>.allocate(capacity: 1)
@@ -163,7 +159,7 @@ class PngQCompressor : Compressor {
 		remap.deallocate()
 		map.deallocate()
 		indexedData.deallocate()
-		bufferC.deallocate()
+		
 		
 		return CompressedImage(buffer: output_file_data.pointee!, bufferSize: output_file_size)
 	
@@ -175,18 +171,13 @@ class PosterizerCompressor : Compressor {
 	
 	
 	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
-		let bufferCopy = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h*4)
-		for i in 0..<(w*h*4) {
-			bufferCopy[i] = buffer[i]
-		}
+		
 		
 		let maxLevels = min(255, max(2, UInt32(colorCount)))
-		posterizer(bufferCopy, UInt32(w), UInt32(h), maxLevels, 1.0, shouldDither)
-		
+		posterizer(buffer, UInt32(w), UInt32(h), maxLevels, 1.0, shouldDither)
 		let output_file_data = UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>.allocate(capacity: 1)
 		var output_file_size : Int = 0
-		lodepng_encode32(output_file_data, &output_file_size, bufferCopy, UInt32(w), UInt32(h))
-		bufferCopy.deallocate()
+		lodepng_encode32(output_file_data, &output_file_size, buffer, UInt32(w), UInt32(h))
 		return CompressedImage(buffer: output_file_data.pointee!, bufferSize: output_file_size)
 	}
 	
