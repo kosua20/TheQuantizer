@@ -33,7 +33,14 @@ class InteractiveImageView: NSView {
 
 
 	}
-
+	
+	public var smoothed : Bool = true {
+		didSet {
+			imageLayer.magnificationFilter = smoothed ? .linear : .nearest
+			imageLayer.minificationFilter = smoothed ? .linear : .nearest
+			needsDisplay = true
+		}
+	}
 
 	private var imageLayer = CALayer()
 	private var imageOffset = CGPoint(x: 0, y: 0)
@@ -107,11 +114,6 @@ class InteractiveImageView: NSView {
 		}
 		
 		imageZoom = Double(min(16.0,max(1.0/128.0,zoom)))
-		
-		
-		
-		
-		
 		
 		let w = (frame.size.width + image!.size.width * zoom) / 2
 		let h = (frame.size.height + image!.size.height * zoom) / 2

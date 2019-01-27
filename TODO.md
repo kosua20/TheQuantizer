@@ -3,7 +3,6 @@
 ### Functionalities
 
 * export result image
-* interpolation modes
 * scrolling to zoom
 * click+drag to pan
 

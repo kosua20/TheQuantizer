@@ -71,7 +71,7 @@ class DocumentViewController: NSViewController, ImageLoaderDelegate {
 	
 	@IBOutlet weak var smoothingCheck: NSButton!
 	@IBAction func smoothingCheckChanged(_ sender: NSButton) {
-		//imag
+		imageView.smoothed = sender.state == .on
 	}
 	
 	@IBOutlet weak var scaleSlider: NSSlider!
