@@ -11,8 +11,5 @@
 
 
 ### Other
-
-* icon
 * readme
 * screenshots
-* sort out licences
