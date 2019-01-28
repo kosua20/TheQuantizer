@@ -113,7 +113,7 @@ typedef struct {
 
 
 
- void remap_floyd(unsigned char * rgba_data, unsigned int cols, unsigned int rows, unsigned char * map, unsigned int* remap,  unsigned char * indexed_data, int quantization_method)
+ void remap_floyd(network_data * networkdata, unsigned char * rgba_data, unsigned int cols, unsigned int rows, unsigned char * map, unsigned int* remap,  unsigned char * indexed_data, int quantization_method)
 {
 	// uch *outrow = NULL; /* Output image pixels */
 	
@@ -139,7 +139,7 @@ typedef struct {
 			int idx;
 			unsigned int floyderr = rederr*rederr + greenerr*greenerr + blueerr*blueerr + alphaerr*alphaerr;
 			
-			idx = inxsearch(CLAMP(rgba_data[offset+3] - alphaerr),
+			idx = inxsearch(networkdata, CLAMP(rgba_data[offset+3] - alphaerr),
 							CLAMP(rgba_data[offset+2] - blueerr),
 							CLAMP(rgba_data[offset+1] - greenerr),
 							CLAMP(rgba_data[offset]   - rederr  ));
@@ -196,7 +196,7 @@ typedef struct {
 	
 }
 
- void remap_simple(unsigned char * rgba_data, unsigned int cols, unsigned int rows, unsigned int* remap, unsigned char * indexed_data)
+ void remap_simple(network_data * networkdata, unsigned char * rgba_data, unsigned int cols, unsigned int rows, unsigned int* remap, unsigned char * indexed_data)
 {
 	unsigned int i,row;
 	unsigned int offset;
@@ -206,7 +206,7 @@ typedef struct {
 		/* Assign the new colors */
 		offset = row*cols*4;
 		for( i=0;i<cols;i++){
-			indexed_data[row*cols+i] = remap[inxsearch(rgba_data[i*4+offset+3],
+			indexed_data[row*cols+i] = remap[inxsearch(networkdata, rgba_data[i*4+offset+3],
 													   rgba_data[i*4+offset+2],
 													   rgba_data[i*4+offset+1],
 													   rgba_data[i*4+offset])];

@@ -318,10 +318,8 @@ static void remap(png24_image_shim *img, const palette *pal, bool dither)
 // it doesn't count unique colors, only intensity values of all channels
 static void intensity_histogram(const png24_image_shim *img, hist_entry histogram[static 256])
 {
-	
 	const unsigned int imgHeight = img->height;
 	const unsigned int imageWidth = img->width;
-	const unsigned char * pixel_data = img->rgba_data;
 	
     for(unsigned int i=0; i < imgHeight; i++) {
 		

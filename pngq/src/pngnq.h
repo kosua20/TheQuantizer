@@ -47,6 +47,6 @@
 #include <stdio.h>
 
 
-void remap_floyd(unsigned char * rgba_data, unsigned int cols, unsigned int rows, unsigned char * map, unsigned int* remap,  unsigned char * indexed_data, int quantization_method);
+void remap_floyd(network_data * networkdata, unsigned char * rgba_data, unsigned int cols, unsigned int rows, unsigned char * map, unsigned int* remap,  unsigned char * indexed_data, int quantization_method);
 
-void remap_simple(unsigned char * rgba_data, unsigned int cols, unsigned int rows, unsigned int* remap, unsigned char * indexed_data);
+void remap_simple(network_data * networkdata, unsigned char * rgba_data, unsigned int cols, unsigned int rows, unsigned int* remap, unsigned char * indexed_data);

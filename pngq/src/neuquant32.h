@@ -50,30 +50,62 @@
 #define minpicturebytes	(4*prime4)		/* minimum size for input image */
 
 
+
+typedef struct                          /* ABGRc */
+{
+	double al,b,g,r;
+} nq_pixel;
+
+typedef struct
+{
+	unsigned char r,g,b,al;
+} nq_colormap;
+
+
+#define initrad     (MAXNETSIZE>>3)     /* for 256 cols, radius starts */
+typedef struct  {
+	nq_pixel network[MAXNETSIZE];    /* the network itself */
+	
+	unsigned int netindex[256];      /* for network lookup - really 256 */
+	
+	double bias [MAXNETSIZE];        /* bias and freq arrays for learning */
+	double freq [MAXNETSIZE];
+	double radpower[initrad];        /* radpower for precomputation */
+	
+	unsigned int netsize;            /* Number of colours to use. */
+	
+	double gamma_correction;         /* 1.0/2.2 usually */
+	
+	double biasvalues[256];          /* Biasvalues: based on frequency of nearest pixels */
+	unsigned char *thepicture;      /* the input image itself */
+	unsigned int lengthcount;        /* lengthcount = H*W*4 */
+	nq_colormap colormap[256];
+} network_data;
+
 /* Initialise network in range (0,0,0,0) to (255,255,255,255) and set parameters
    ----------------------------------------------------------------------- */
-void initnet(unsigned char *thepic, unsigned int len, unsigned int colours, double gamma);
+network_data * initnet(unsigned char *thepic, unsigned int len, unsigned int colours, double gamma);
 		
 /* Unbias network to give byte values 0..255 and record position i to prepare for sort
    ----------------------------------------------------------------------------------- */
-static inline double biasvalue(unsigned int temp);
+static inline double biasvalue(network_data * networkdata, unsigned int temp);
 
 /* Output colour map
    ----------------- */
-void getcolormap(unsigned char *map);
+void getcolormap(network_data * networkdata, unsigned char *map);
 
 /* Insertion sort of network and building of netindex[0..255] (to do after unbias)
    ------------------------------------------------------------------------------- */
-void inxbuild();
+void inxbuild(network_data * networkdata);
 
 /* Search for ABGR values 0..255 (after net is unbiased) and return colour index
    ---------------------------------------------------------------------------- */
-unsigned int inxsearch( int al,  int b,  int g,  int r);
-unsigned int slowinxsearch( int al, int b, int g, int r);
+unsigned int inxsearch(network_data * networkdata,  int al,  int b,  int g,  int r);
+unsigned int slowinxsearch(network_data * networkdata,  int al, int b, int g, int r);
 
 /* Main Learning Loop
    ------------------ */
-void learn(unsigned int samplefactor, unsigned int verbose);
+void learn(network_data * networkdata, unsigned int samplefactor, unsigned int verbose);
 
 /* Program Skeleton
    ----------------

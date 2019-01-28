@@ -28,7 +28,7 @@
 
 #include "neuquant32.h"
 #include <math.h>
-
+#include <stdlib.h>
 
 /* 
     Network Definitions
@@ -46,7 +46,6 @@
 #define betagamma   ((double)(1<<(gammashift-betashift)))
 
 /* defs for decreasing radius factor */
-#define initrad     (MAXNETSIZE>>3)     /* for 256 cols, radius starts */
 #define initradius  (initrad*1.0)       /* and decreases by a           */
 #define radiusdec   30                  /* factor of 1/30 each cycle    */ 
 
@@ -62,73 +61,51 @@ double alphadec;                        /* biased by 10 bits */
 #define alpharadbias    ((double)(1<<alpharadbshift))
 
 
-/* 
-    Types and Global Variables
-*/
-   
-static unsigned char *thepicture;      /* the input image itself */
-static unsigned int lengthcount;        /* lengthcount = H*W*4 */
 
-typedef struct                          /* ABGRc */
-{               
-    double al,b,g,r;
-} nq_pixel;
-
-static nq_pixel network[MAXNETSIZE];    /* the network itself */
-
-static unsigned int netindex[256];      /* for network lookup - really 256 */
-
-static double bias [MAXNETSIZE];        /* bias and freq arrays for learning */
-static double freq [MAXNETSIZE];
-static double radpower[initrad];        /* radpower for precomputation */
-
-static unsigned int netsize;            /* Number of colours to use. */
-
-static double gamma_correction;         /* 1.0/2.2 usually */
-
-static double biasvalues[256];          /* Biasvalues: based on frequency of nearest pixels */
 
 /* 
     Initialise network in range (0,0,0,0) to (255,255,255,255) and set parameters
 */
-void initnet(unsigned char *thepic,unsigned int len,unsigned int colours, double gamma_c)
+network_data* initnet(unsigned char *thepic,unsigned int len,unsigned int colours, double gamma_c)
 {
     unsigned int i;
-    
-    gamma_correction = gamma_c;
+    network_data * networkdata = malloc(sizeof(network_data));
+    networkdata->gamma_correction = gamma_c;
     
     /* Clear out network from previous runs */
     /* thanks to Chen Bin for this fix */
-    memset((void*)network,0,sizeof(network));
+    memset((void*)(networkdata->network),0,sizeof(double)*4*MAXNETSIZE);
 
-    thepicture = thepic;
-    lengthcount = len;
-    netsize = colours; 
+    networkdata->thepicture = thepic;
+    networkdata->lengthcount = len;
+    networkdata->netsize = colours;
     
     for(i=0;i<256;i++)
     {
         double temp;
-        temp = pow(i/255.0, 1.0/gamma_correction) * 255.0;
+        temp = pow(i/255.0, 1.0/networkdata->gamma_correction) * 255.0;
         temp = round(temp);
-        biasvalues[i] = temp;
+        networkdata->biasvalues[i] = temp;
     }
     
-    for (i=0; i<netsize; i++) {
-        network[i].b = network[i].g = network[i].r = biasvalue(i*256/netsize);
+    for (i=0; i<networkdata->netsize; i++) {
+        networkdata->network[i].b = networkdata->network[i].g = networkdata->network[i].r = biasvalue(networkdata, i*256/networkdata->netsize);
               
         /*  Sets alpha values at 0 for dark pixels. */
-        if (i < 16) network[i].al = (i*16); else network[i].al = 255; 
+        if (i < 16) networkdata->network[i].al = (i*16); else networkdata->network[i].al = 255;
         
-        freq[i] = 1.0/netsize;  /* 1/netsize */
-        bias[i] = 0;
+        networkdata->freq[i] = 1.0/networkdata->netsize;  /* 1/netsize */
+        networkdata->bias[i] = 0;
     }
+	
+	return networkdata;
 }
 
-static unsigned int unbiasvalue(double temp)
+static unsigned int unbiasvalue(network_data * networkdata, double temp)
 {
     if (temp < 0) return 0;
     
-    temp = pow(temp/255.0, gamma_correction) * 255.0;    
+    temp = pow(temp/255.0, networkdata->gamma_correction) * 255.0;
     temp = floor((temp / 255.0 * 256.0));
 
     if (temp > 255) return 255;
@@ -145,21 +122,21 @@ static inline unsigned int round_biased(double temp)
 }
 
 
-inline static double biasvalue(unsigned int temp)
+inline static double biasvalue(network_data * networkdata, unsigned int temp)
 {    
-    return biasvalues[temp];
+    return networkdata->biasvalues[temp];
 }
 
 /* Output colormap to unsigned char ptr in RGBA format */
-void getcolormap(unsigned char *map)
+void getcolormap(network_data * networkdata, unsigned char *map)
 {
     unsigned int j;
-    for(j=0; j<netsize; j++)
+    for(j=0; j<networkdata->netsize; j++)
     {
-        *map++ = unbiasvalue(network[j].r);
-        *map++ = unbiasvalue(network[j].g);
-        *map++ = unbiasvalue(network[j].b);
-        *map++ = round_biased(network[j].al);
+        *map++ = unbiasvalue(networkdata, networkdata->network[j].r);
+        *map++ = unbiasvalue(networkdata, networkdata->network[j].g);
+        *map++ = unbiasvalue(networkdata, networkdata->network[j].b);
+        *map++ = round_biased(networkdata->network[j].al);
     }
 }
 
@@ -167,53 +144,48 @@ void getcolormap(unsigned char *map)
 /* Insertion sort of network and building of netindex[0..255] (to do after unbias)
    ------------------------------------------------------------------------------- */
 
-typedef struct 
-{
-    unsigned char r,g,b,al;  
-} nq_colormap;
 
-static nq_colormap colormap[256];
 
-void inxbuild()
+void inxbuild(network_data * networkdata)
 {
     unsigned int i,j,smallpos,smallval;
     unsigned int previouscol,startpos;
 
-    for(i=0; i< netsize; i++)
+    for(i=0; i< networkdata->netsize; i++)
     {
-        colormap[i].r =  biasvalue(unbiasvalue(network[i].r));
-        colormap[i].g =  biasvalue(unbiasvalue(network[i].g));
-        colormap[i].b =  biasvalue(unbiasvalue(network[i].b));
-        colormap[i].al = round_biased(network[i].al);        
+        networkdata->colormap[i].r =  biasvalue(networkdata,unbiasvalue(networkdata, networkdata->network[i].r));
+        networkdata->colormap[i].g =  biasvalue(networkdata, unbiasvalue(networkdata, networkdata->network[i].g));
+        networkdata->colormap[i].b =  biasvalue(networkdata, unbiasvalue(networkdata, networkdata->network[i].b));
+        networkdata->colormap[i].al = round_biased(networkdata->network[i].al);
     }
         
     previouscol = 0;
     startpos = 0;
-    for (i=0; i<netsize; i++) {
+    for (i=0; i<networkdata->netsize; i++) {
         smallpos = i;
-        smallval = (colormap[i].g);         /* index on g */
+        smallval = (networkdata->colormap[i].g);         /* index on g */
         /* find smallest in i..netsize-1 */
-        for (j=i+1; j<netsize; j++) {
-            if ((colormap[j].g) < smallval) {       /* index on g */
+        for (j=i+1; j<networkdata->netsize; j++) {
+            if ((networkdata->colormap[j].g) < smallval) {       /* index on g */
                 smallpos = j;
-                smallval = (colormap[j].g); /* index on g */
+                smallval = (networkdata->colormap[j].g); /* index on g */
             }
         }
         /* swap colormap[i] (i) and colormap[smallpos] (smallpos) entries */
         if (i != smallpos) {
-            nq_pixel temp = network[smallpos];   network[smallpos] = network[i];   network[i] = temp;
-            nq_colormap tempc = colormap[smallpos];   colormap[smallpos] = colormap[i];   colormap[i] = tempc;
+            nq_pixel temp = networkdata->network[smallpos];   networkdata->network[smallpos] = networkdata->network[i];   networkdata->network[i] = temp;
+            nq_colormap tempc = networkdata->colormap[smallpos];   networkdata->colormap[smallpos] = networkdata->colormap[i];   networkdata->colormap[i] = tempc;
         }
         /* smallval entry is now in position i */
         if (smallval != previouscol) {
-            netindex[previouscol] = (startpos+i)>>1;
-            for (j=previouscol+1; j<smallval; j++) netindex[j] = i;
+            networkdata->netindex[previouscol] = (startpos+i)>>1;
+            for (j=previouscol+1; j<smallval; j++) networkdata->netindex[j] = i;
             previouscol = smallval;
             startpos = i;
         }
     }
-    netindex[previouscol] = (startpos+maxnetpos)>>1;
-    for (j=previouscol+1; j<256; j++) netindex[j] = maxnetpos; /* really 256 */
+    networkdata->netindex[previouscol] = (startpos+maxnetpos)>>1;
+    for (j=previouscol+1; j<256; j++) networkdata->netindex[j] = maxnetpos; /* really 256 */
 }
 
         
@@ -226,29 +198,29 @@ inline static double colorimportance(double al)
 /* Search for ABGR values 0..255 (after net is unbiased) and return colour index
    ---------------------------------------------------------------------------- */
 
-unsigned int slowinxsearch( int al, int b, int g, int r)
+unsigned int slowinxsearch(network_data * networkdata,  int al, int b, int g, int r)
 {
     unsigned int i,best=0;
     double a,bestd=1<<30,dist;
     
-    r=biasvalue(r);
-    g=biasvalue(g);
-    b=biasvalue(b);
+    r=biasvalue(networkdata, r);
+    g=biasvalue(networkdata, g);
+    b=biasvalue(networkdata, b);
    
     double colimp = colorimportance(al);
     
-    for(i=0; i < netsize; i++)
+    for(i=0; i < networkdata->netsize; i++)
     {
-        a = colormap[i].r - r;
+        a = networkdata->colormap[i].r - r;
         dist = a*a * colimp;
 
-        a = colormap[i].g - g;
+        a = networkdata->colormap[i].g - g;
         dist += a*a * colimp;
         
-        a = colormap[i].b - b;
+        a = networkdata->colormap[i].b - b;
         dist += a*a * colimp;
         
-        a = colormap[i].al - al;
+        a = networkdata->colormap[i].al - al;
         dist += a*a;
         
         if (dist<bestd) {bestd=dist; best=i;}        
@@ -256,7 +228,7 @@ unsigned int slowinxsearch( int al, int b, int g, int r)
     return best;
 }
 
-unsigned int inxsearch( int al, int b, int g, int r)
+unsigned int inxsearch( network_data * networkdata, int al, int b, int g, int r)
 {
     unsigned int i; int j; double dist,a,bestd;
     unsigned int best;
@@ -266,34 +238,34 @@ unsigned int inxsearch( int al, int b, int g, int r)
  
     if (al)
     {       
-        r=biasvalue(r);
-        g=biasvalue(g);
-        b=biasvalue(b);
+        r=biasvalue(networkdata,r);
+        g=biasvalue(networkdata, g);
+        b=biasvalue(networkdata, b);
     }
     else
     {
         r=g=b=0;
     }
 
-    i = netindex[(g)];  /* index on g */
+    i = networkdata->netindex[(g)];  /* index on g */
     j = i-1;        /* start at netindex[g] and work outwards */
 
 
     double colimp = colorimportance(al);
 
-    while ((i<netsize) || (j>=0)) {
-        if (i<netsize) {
-            a = colormap[i].g - g;      /* inx key */
+    while ((i<networkdata->netsize) || (j>=0)) {
+        if (i<networkdata->netsize) {
+            a = networkdata->colormap[i].g - g;      /* inx key */
             dist = a*a * colimp;
             if (dist > bestd) break;    /* stop iter */
             else {
-                a = colormap[i].r - r;
+                a = networkdata->colormap[i].r - r;
                 dist += a*a * colimp;
                 if (dist<bestd) {
-                    a = colormap[i].b - b;
+                    a = networkdata->colormap[i].b - b;
                     dist += a*a * colimp;
                     if(dist<bestd) {
-                        a = colormap[i].al - al;
+                        a = networkdata->colormap[i].al - al;
                         dist += a*a;
                         if (dist<bestd) {bestd=dist; best=i;}
                     }
@@ -302,17 +274,17 @@ unsigned int inxsearch( int al, int b, int g, int r)
             }
         }
         if (j>=0) {
-            a = colormap[j].g - g; /* inx key - reverse dif */
+            a = networkdata->colormap[j].g - g; /* inx key - reverse dif */
             dist = a*a * colimp;
             if (dist > bestd) break; /* stop iter */
             else {
-                a = colormap[j].b - b;
+                a = networkdata->colormap[j].b - b;
                 dist += a*a * colimp;
                 if (dist<bestd) {
-                    a = colormap[j].r - r;
+                    a = networkdata->colormap[j].r - r;
                     dist += a*a * colimp;
                     if(dist<bestd) {
-                        a = colormap[j].al - al;
+                        a = networkdata->colormap[j].al - al;
                         dist += a*a;
                         if (dist<bestd) {bestd=dist; best=j;}
                     }
@@ -330,7 +302,7 @@ unsigned int inxsearch( int al, int b, int g, int r)
 /* Search for biased ABGR values
    ---------------------------- */
 
-int contest(double al,double b,double g,double r)
+int contest(network_data * networkdata, double al,double b,double g,double r)
 {
     /* finds closest neuron (min dist) and updates freq */
     /* finds best neuron (min dist-bias) and returns position */
@@ -350,31 +322,31 @@ int contest(double al,double b,double g,double r)
     */ 
     double colimp = 1.0; //colorimportance(al); 
     
-    for (i=0; i<netsize; i++)
+    for (i=0; i<networkdata->netsize; i++)
     {
-        double bestbiasd_biased = bestbiasd + bias[i];
+        double bestbiasd_biased = bestbiasd + networkdata->bias[i];
         
-        a = network[i].b - b;
+        a = networkdata->network[i].b - b;
         dist = ABS(a) * colimp;
-        a = network[i].r - r;
+        a = networkdata->network[i].r - r;
         dist += ABS(a) * colimp;
         
         if (dist < bestd || dist < bestbiasd_biased)
         {                 
-            a = network[i].g - g;
+            a = networkdata->network[i].g - g;
             dist += ABS(a) * colimp;
-            a = network[i].al - al;
+            a = networkdata->network[i].al - al;
             dist += ABS(a);
             
             if (dist<bestd) {bestd=dist; bestpos=i;}
-            if (dist<bestbiasd_biased) {bestbiasd=dist - bias[i]; bestbiaspos=i;}
+            if (dist<bestbiasd_biased) {bestbiasd=dist - networkdata->bias[i]; bestbiaspos=i;}
         }
-        betafreq = freq[i] / (1<< betashift);
-        freq[i] -= betafreq;
-        bias[i] += betafreq * (1<<gammashift);
+        betafreq = networkdata->freq[i] / (1<< betashift);
+        networkdata->freq[i] -= betafreq;
+        networkdata->bias[i] += betafreq * (1<<gammashift);
     }
-    freq[bestpos] += beta;
-    bias[bestpos] -= betagamma;
+    networkdata->freq[bestpos] += beta;
+    networkdata->bias[bestpos] -= betagamma;
     return(bestbiaspos);
 }
 
@@ -382,49 +354,49 @@ int contest(double al,double b,double g,double r)
 /* Move neuron i towards biased (a,b,g,r) by factor alpha
    ---------------------------------------------------- */
 
-static void altersingle(double alpha,unsigned int i,double al,double b,double g,double r)
+static void altersingle(network_data * networkdata, double alpha,unsigned int i,double al,double b,double g,double r)
 {    
     double colorimp = 1.0;//0.5;// + 0.7*colorimportance(al);
     
     alpha /= initalpha;
     
     /* alter hit neuron */
-    network[i].al -= alpha*(network[i].al - al);
-    network[i].b -= colorimp*alpha*(network[i].b - b);
-    network[i].g -= colorimp*alpha*(network[i].g - g);
-    network[i].r -= colorimp*alpha*(network[i].r - r);
+    networkdata->network[i].al -= alpha*(networkdata->network[i].al - al);
+    networkdata->network[i].b -= colorimp*alpha*(networkdata->network[i].b - b);
+    networkdata->network[i].g -= colorimp*alpha*(networkdata->network[i].g - g);
+    networkdata->network[i].r -= colorimp*alpha*(networkdata->network[i].r - r);
 }
 
 
 /* Move adjacent neurons by precomputed alpha*(1-((i-j)^2/[r]^2)) in radpower[|i-j|]
    --------------------------------------------------------------------------------- */
 
-static void alterneigh(unsigned int rad,unsigned int i,double al,double b,double g,double r)
+static void alterneigh(network_data * networkdata, unsigned int rad,unsigned int i,double al,double b,double g,double r)
 {
     unsigned int j,hi;
     int k,lo;
     double *q,a;
 
     lo = i-rad;   if (lo<0) lo=0;
-    hi = i+rad;   if (hi>netsize) hi=netsize;
+    hi = i+rad;   if (hi>networkdata->netsize) hi=networkdata->netsize;
 
     j = i+1;
     k = i-1;
-    q = radpower;
+    q = networkdata->radpower;
     while ((j<hi) || (k>lo)) {
         a = (*(++q)) / alpharadbias;
 		if (j<hi) {
-            network[j].al -= a*(network[j].al - al);
-            network[j].b  -= a*(network[j].b  - b) ;
-            network[j].g  -= a*(network[j].g  - g) ;
-            network[j].r  -= a*(network[j].r  - r) ;
+            networkdata->network[j].al -= a*(networkdata->network[j].al - al);
+            networkdata->network[j].b  -= a*(networkdata->network[j].b  - b) ;
+            networkdata->network[j].g  -= a*(networkdata->network[j].g  - g) ;
+            networkdata->network[j].r  -= a*(networkdata->network[j].r  - r) ;
             j++;
         }
         if (k>lo) {
-            network[k].al -= a*(network[k].al - al);
-            network[k].b  -= a*(network[k].b  - b) ;
-            network[k].g  -= a*(network[k].g  - g) ;
-            network[k].r  -= a*(network[k].r  - r) ;
+            networkdata->network[k].al -= a*(networkdata->network[k].al - al);
+            networkdata->network[k].b  -= a*(networkdata->network[k].b  - b) ;
+            networkdata->network[k].g  -= a*(networkdata->network[k].g  - g) ;
+            networkdata->network[k].r  -= a*(networkdata->network[k].r  - r) ;
             k--;
         }
     }
@@ -434,7 +406,7 @@ static void alterneigh(unsigned int rad,unsigned int i,double al,double b,double
 /* Main Learning Loop
    ------------------ */
 /* sampling factor 1..30 */
-void learn(unsigned int samplefac, unsigned int verbose) /* Stu: N.B. added parameter so that main() could control verbosity. */
+void learn(network_data * networkdata, unsigned int samplefac, unsigned int verbose) /* Stu: N.B. added parameter so that main() could control verbosity. */
 {
     unsigned int i,j,al,b,g,r;
     unsigned int rad,step,delta,samplepixels;
@@ -443,9 +415,9 @@ void learn(unsigned int samplefac, unsigned int verbose) /* Stu: N.B. added para
     unsigned char *lim;
     
     alphadec = 30 + ((samplefac-1)/3);
-    p = thepicture;
-    lim = thepicture + lengthcount;
-    samplepixels = lengthcount/(4*samplefac); 
+    p = networkdata->thepicture;
+    lim = networkdata->thepicture + networkdata->lengthcount;
+    samplepixels = networkdata->lengthcount/(4*samplefac);
     delta = samplepixels/ncycles;  /* here's a problem with small images: samplepixels < ncycles => delta = 0 */
     if(delta==0) delta = 1;        /* kludge to fix */
     alpha = initalpha;
@@ -454,15 +426,15 @@ void learn(unsigned int samplefac, unsigned int verbose) /* Stu: N.B. added para
     rad = radius;
     if (rad <= 1) rad = 0;
     for (i=0; i<rad; i++) 
-        radpower[i] = floor( alpha*(((rad*rad - i*i)*radbias)/(rad*rad)) );
+        networkdata->radpower[i] = floor( alpha*(((rad*rad - i*i)*radbias)/(rad*rad)) );
     
     if(verbose) fprintf(stderr,"beginning 1D learning: initial radius=%d\n", rad);
 
-    if ((lengthcount%prime1) != 0) step = 4*prime1;
+    if ((networkdata->lengthcount%prime1) != 0) step = 4*prime1;
     else {
-        if ((lengthcount%prime2) !=0) step = 4*prime2;
+        if ((networkdata->lengthcount%prime2) !=0) step = 4*prime2;
         else {
-            if ((lengthcount%prime3) !=0) step = 4*prime3;
+            if ((networkdata->lengthcount%prime3) !=0) step = 4*prime3;
             else step = 4*prime4;
         }
     }
@@ -473,21 +445,21 @@ void learn(unsigned int samplefac, unsigned int verbose) /* Stu: N.B. added para
         if (p[3])
         {            
             al =p[3];
-            b = biasvalue(p[2]);
-            g = biasvalue(p[1]);
-            r = biasvalue(p[0]);
+            b = biasvalue(networkdata, p[2]);
+            g = biasvalue(networkdata, p[1]);
+            r = biasvalue(networkdata, p[0]);
         }
         else
         {
             al=r=g=b=0;
         }
-        j = contest(al,b,g,r);
+        j = contest(networkdata, al,b,g,r);
 
-        altersingle(alpha,j,al,b,g,r);
-        if (rad) alterneigh(rad,j,al,b,g,r);   /* alter neighbours */
+        altersingle(networkdata, alpha,j,al,b,g,r);
+        if (rad) alterneigh(networkdata, rad,j,al,b,g,r);   /* alter neighbours */
 
         p += step;
-        while (p >= lim) p -= lengthcount;
+        while (p >= lim) p -= networkdata->lengthcount;
     
         i++;
         if (i%delta == 0) {                    /* FPE here if delta=0*/ 
@@ -496,7 +468,7 @@ void learn(unsigned int samplefac, unsigned int verbose) /* Stu: N.B. added para
             rad = radius;
             if (rad <= 1) rad = 0;
             for (j=0; j<rad; j++) 
-                radpower[j] = floor( alpha*(((rad*rad - j*j)*radbias)/(rad*rad)) );
+               networkdata-> radpower[j] = floor( alpha*(((rad*rad - j*j)*radbias)/(rad*rad)) );
         }
     }
     if(verbose) fprintf(stderr,"finished 1D learning: final alpha=%f !\n",((float)alpha)/initalpha);

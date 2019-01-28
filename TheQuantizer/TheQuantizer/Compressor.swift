@@ -96,13 +96,13 @@ class PngQCompressor : Compressor {
 		let rows = UInt32(h)
 		let sampleFactor = min(Int(1 + Double(w*h)/(512.0*512)), 10)
 		
-		initnet(buffer, cols*rows*4, UInt32(colorCountBounded), gamma)
-		learn(UInt32(sampleFactor), 0)
-		inxbuild()
+		let network = initnet(buffer, cols*rows*4, UInt32(colorCountBounded), gamma)
+		learn(network, UInt32(sampleFactor), 0)
+		inxbuild(network)
 		
 		
 		let map = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(MAXNETSIZE)*4)
-		getcolormap(map)
+		getcolormap(network, map)
 		
 		let remap = UnsafeMutablePointer<UInt32>.allocate(capacity: Int(MAXNETSIZE))
 		var botIdx : UInt32 = 0
@@ -126,9 +126,9 @@ class PngQCompressor : Compressor {
 		let indexedData = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h)
 		
 		if shouldDither {
-			remap_floyd(buffer, cols, rows, map, remap, indexedData, 1)
+			remap_floyd(network, buffer, cols, rows, map, remap, indexedData, 1)
 		} else {
-			remap_simple(buffer, cols, rows, remap, indexedData)
+			remap_simple(network, buffer, cols, rows, remap, indexedData)
 		}
 		
 		let state = UnsafeMutablePointer<LodePNGState>.allocate(capacity: 1)
