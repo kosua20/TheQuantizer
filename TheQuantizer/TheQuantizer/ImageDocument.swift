@@ -40,7 +40,10 @@ class ImageDocument: NSDocument {
 	}
 
 	override func data(ofType typeName: String) throws -> Data {
-		throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+		if let _ = newData {
+			return newData!
+		}
+		throw UnprocessedFileError()
 	}
 
 	override func read(from data: Data, ofType typeName: String) throws {

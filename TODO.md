@@ -2,7 +2,6 @@
 ## To do
 ### Functionalities
 
-* export result image
 * scrolling to zoom
 * click+drag to pan
 

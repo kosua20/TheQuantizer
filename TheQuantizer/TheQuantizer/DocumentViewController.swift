@@ -8,14 +8,7 @@
 
 import Cocoa
 
-
-
-
 class DocumentViewController: NSViewController, ImageLoaderDelegate {
-	
-	
-
-	
 	
 	// Ui elements.
 	@IBOutlet weak var backgroundLabel: NSTextField!

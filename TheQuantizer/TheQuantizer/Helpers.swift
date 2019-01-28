@@ -23,6 +23,18 @@ class InvalidFileError : NSError {
 	
 }
 
+class UnprocessedFileError : NSError {
+	
+	init() {
+		super.init(domain: "ApplicationDomain", code: 2, userInfo: [:])
+	}
+	
+	required init?(coder aDecoder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+	
+}
+
 extension NSImage {
 	
 	func rgbaRepresentation() -> UnsafeMutablePointer<UInt8> {
