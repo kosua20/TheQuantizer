@@ -169,12 +169,16 @@ class PngQCompressor : Compressor {
 
 class PosterizerCompressor : Compressor {
 	
+	static var first = true
 	
 	static func compress(buffer: UnsafeMutablePointer<UInt8>, w: Int, h: Int, colorCount: Int, shouldDither: Bool) -> CompressedImage? {
-		
+		if first {
+			set_gamma(1.0)
+			first = false
+		}
 		
 		let maxLevels = min(255, max(2, UInt32(colorCount)))
-		posterizer(buffer, UInt32(w), UInt32(h), maxLevels, 1.0, shouldDither)
+		posterizer(buffer, UInt32(w), UInt32(h), maxLevels, shouldDither)
 		let output_file_data = UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>.allocate(capacity: 1)
 		var output_file_size : Int = 0
 		lodepng_encode32(output_file_data, &output_file_size, buffer, UInt32(w), UInt32(h))
@@ -195,7 +199,7 @@ class BlurizerCompresser : Compressor {
 		}
 		
 		let maxLevels = min(255, max(2, UInt32(colorCount)))
-		blurizer(bufferCopy, UInt32(w), UInt32(h), maxLevels, 1.0)
+		blurizer(bufferCopy, UInt32(w), UInt32(h), maxLevels)
 		
 		let output_file_data = UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>.allocate(capacity: 1)
 		var output_file_size : Int = 0

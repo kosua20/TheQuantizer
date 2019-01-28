@@ -17,6 +17,9 @@
 
 #include <stdbool.h>
 
-void posterizer(unsigned char * rgbaData, unsigned int w, unsigned int h, unsigned int maxLevels, float gamma, bool dither);
 
-void blurizer(unsigned char * rgbaData, unsigned int w, unsigned int h, unsigned int maxLevels, float gamma);
+void set_gamma(const double gamma);
+
+void posterizer(unsigned char * rgbaData, unsigned int w, unsigned int h, unsigned int maxLevels, bool dither);
+
+void blurizer(unsigned char * rgbaData, unsigned int w, unsigned int h, unsigned int maxLevels);

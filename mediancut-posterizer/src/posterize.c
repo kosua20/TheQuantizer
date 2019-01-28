@@ -86,7 +86,8 @@ inline static unsigned int linear_to_int(const double value)
 }
 
 static double image_gamma, gamma_lut[256];
-static void set_gamma(const double gamma)
+
+void set_gamma(const double gamma)
 {
     image_gamma = gamma;
     for(int i=0; i < 256; i++) gamma_lut[i] = pow(int_to_linear(i), gamma);
@@ -499,18 +500,16 @@ static void posterize(png24_image_shim *img, unsigned int maxlevels, const doubl
     remap(img, &pal, dither);
 }
 
-void posterizer(unsigned char * rgbaData, unsigned int w, unsigned int h, unsigned int maxLevels, float gamma, bool dither){
+void posterizer(unsigned char * rgbaData, unsigned int w, unsigned int h, unsigned int maxLevels, bool dither){
 	png24_image_shim img;
 	img.height = h;
 	img.width = w;
 	img.rgba_data = rgbaData;
-	set_gamma(gamma);
 	const double maxError = quality_to_mse(0);
 	posterize(&img, maxLevels, maxError, dither, false);
 }
 
-void blurizer(unsigned char * rgbaData, unsigned int w, unsigned int h, unsigned int maxLevels, float gamma){
-	set_gamma(gamma);
+void blurizer(unsigned char * rgbaData, unsigned int w, unsigned int h, unsigned int maxLevels){
 	optimizeForAverageFilter(rgbaData, w, h, 256 - maxLevels);
 }
 
