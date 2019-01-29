@@ -10,6 +10,7 @@ import Cocoa
 
 protocol ImageLoaderDelegate : class {
 	func loadItem(at: URL)
+	func update(zoom : Double)
 }
 
 class InteractiveImageView: NSView {
@@ -44,8 +45,13 @@ class InteractiveImageView: NSView {
 
 	private var imageLayer = CALayer()
 	private var imageOffset = CGPoint(x: 0, y: 0)
-	private var imageZoom = 1.0
-
+	public var imageZoom = 1.0 {
+		didSet {
+			updateImageFrame()
+		}
+	}
+	
+	private var windowZoom : CGFloat = 1.0
 
 	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
@@ -103,20 +109,28 @@ class InteractiveImageView: NSView {
 		return false
 	}
 	
+	override func scrollWheel(with event: NSEvent) {
+		delegate?.update(zoom: imageZoom + 0.02*Double(event.scrollingDeltaY))
+	}
+	
+	override func mouseDragged(with event: NSEvent) {
+		print(event.deltaX)
+	}
+	
 	func updateImageFrame(){
 		guard let _ = image else {
 			return
 		}
 		
-		var zoom = min(frame.size.width/image!.size.width, frame.size.height/image!.size.height)
-		if zoom > 1.0 {
-			zoom = min(4.0, floor(zoom))
+		windowZoom = min(frame.size.width/image!.size.width, frame.size.height/image!.size.height)
+		if windowZoom > 1.0 {
+			windowZoom = min(4.0, floor(windowZoom))
 		}
+		windowZoom = min(16.0,max(1.0/128.0,windowZoom))
 		
-		imageZoom = Double(min(16.0,max(1.0/128.0,zoom)))
-		
-		let w = (frame.size.width + image!.size.width * zoom) / 2
-		let h = (frame.size.height + image!.size.height * zoom) / 2
+		let finalZoom = windowZoom * CGFloat(imageZoom)
+		let w = (frame.size.width + image!.size.width * finalZoom) / 2
+		let h = (frame.size.height + image!.size.height * finalZoom) / 2
 		
 		imageOffset.x = max(-w+15, min(w-15, imageOffset.x))
 		imageOffset.y = max(-h+15, min(h-15, imageOffset.y))
@@ -128,7 +142,7 @@ class InteractiveImageView: NSView {
 		
 		CATransaction.begin()
 		CATransaction.setDisableActions(true)
-		imageLayer.frame = NSMakeRect(layerCenter.x, layerCenter.y, zoom*image!.size.width, zoom*image!.size.height)
+		imageLayer.frame = NSMakeRect(layerCenter.x, layerCenter.y, finalZoom*image!.size.width, finalZoom*image!.size.height)
 		CATransaction.commit()
 		
 		

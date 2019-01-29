@@ -8,6 +8,9 @@
 
 import Cocoa
 
+
+
+
 class DocumentViewController: NSViewController, ImageLoaderDelegate {
 	
 	// Ui elements.
@@ -71,9 +74,16 @@ class DocumentViewController: NSViewController, ImageLoaderDelegate {
 	@IBOutlet weak var scaleStepper: NSStepper!
 	@IBOutlet weak var scaleLabel: NSTextField!
 	
+	func update(zoom : Double){
+		let newZoom = min(max(zoom, 0.1), scaleSlider.maxValue)
+		scaleLabel.cell?.stringValue = newZoom.string(fractionDigits: 1) + "x"
+		scaleStepper.doubleValue = newZoom
+		scaleSlider.doubleValue = newZoom
+		imageView.imageZoom = newZoom
+	}
+	
 	@IBAction func scaleSliderChanged(_ sender: NSSlider) {
-		scaleLabel.cell?.stringValue = sender.doubleValue.string(fractionDigits: 1) + "x"
-		scaleStepper.doubleValue = sender.doubleValue
+		update(zoom: sender.doubleValue)
 	}
 	
 	@IBAction func scaleStepperChanged(_ sender: NSStepper) {
@@ -84,12 +94,7 @@ class DocumentViewController: NSViewController, ImageLoaderDelegate {
 		} else {
 			currentValue = ceil(scaleSlider.doubleValue - 1)
 		}
-		// Safety clamping.
-		currentValue = max(scaleSlider.minValue, min(scaleSlider.maxValue, currentValue))
-		
-		scaleLabel.cell?.stringValue = currentValue.string(fractionDigits: 1) + "x"
-		scaleSlider.doubleValue = currentValue
-		sender.doubleValue = currentValue
+		update(zoom: currentValue)
 	}
 	
 	

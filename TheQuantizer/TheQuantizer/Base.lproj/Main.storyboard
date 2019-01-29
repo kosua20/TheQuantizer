@@ -445,8 +445,8 @@
                                             <action selector="colorsSliderChanged:" target="5gI-5U-AMq" id="UtG-cd-XzI"/>
                                         </connections>
                                     </slider>
-                                    <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CE6-Y0-1LK">
-                                        <rect key="frame" x="373" y="40" width="35" height="20"/>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CE6-Y0-1LK">
+                                        <rect key="frame" x="455" y="66" width="35" height="20"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" enabled="NO" alignment="right" title="1x" id="YRW-iA-1tv">
                                             <font key="font" metaFont="smallSystem"/>
@@ -483,10 +483,10 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <slider hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JpX-4v-csg">
-                                        <rect key="frame" x="368" y="65" width="82" height="15"/>
+                                    <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JpX-4v-csg">
+                                        <rect key="frame" x="380" y="55" width="93" height="15"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <sliderCell key="cell" controlSize="mini" continuous="YES" enabled="NO" state="on" alignment="left" maxValue="8" doubleValue="1" tickMarkPosition="below" numberOfTickMarks="9" sliderType="linear" id="ImM-Qa-9yy"/>
+                                        <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="10" doubleValue="1" tickMarkPosition="below" numberOfTickMarks="9" sliderType="linear" id="ImM-Qa-9yy"/>
                                         <connections>
                                             <action selector="scaleSliderChanged:" target="5gI-5U-AMq" id="pJq-BQ-DfS"/>
                                         </connections>
@@ -506,7 +506,7 @@
                                         </connections>
                                     </button>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IGO-aK-dht">
-                                        <rect key="frame" x="181" y="76" width="39" height="17"/>
+                                        <rect key="frame" x="179" y="76" width="39" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="256" id="QvT-dM-iuy">
                                             <font key="font" metaFont="system"/>
@@ -522,16 +522,16 @@
                                             <action selector="colorsStepperChanged:" target="5gI-5U-AMq" id="g9T-0q-lhd"/>
                                         </connections>
                                     </stepper>
-                                    <stepper hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z3d-Nf-5ax">
-                                        <rect key="frame" x="403" y="45" width="13" height="15"/>
+                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z3d-Nf-5ax">
+                                        <rect key="frame" x="479" y="55" width="13" height="15"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <stepperCell key="cell" controlSize="mini" continuous="YES" enabled="NO" alignment="left" maxValue="8" doubleValue="1" id="HkR-bx-R2l"/>
+                                        <stepperCell key="cell" controlSize="mini" continuous="YES" alignment="left" maxValue="10" doubleValue="1" id="HkR-bx-R2l"/>
                                         <connections>
                                             <action selector="scaleStepperChanged:" target="5gI-5U-AMq" id="FnJ-xM-mTq"/>
                                         </connections>
                                     </stepper>
                                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="kfe-N2-oph">
-                                        <rect key="frame" x="170" y="76" width="16" height="16"/>
+                                        <rect key="frame" x="169" y="76" width="16" height="16"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </progressIndicator>
                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gJN-Ay-xXV">
@@ -557,7 +557,7 @@
                                         </connections>
                                     </popUpButton>
                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="98b-mO-otw">
-                                        <rect key="frame" x="239" y="27" width="121" height="19"/>
+                                        <rect key="frame" x="380" y="27" width="110" height="19"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="roundRect" title="Show original" bezelStyle="roundedRect" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hgv-Fm-wUB">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -589,6 +589,15 @@
                                             <action selector="ditheredCheckChanged:" target="5gI-5U-AMq" id="7Ao-3i-SwV"/>
                                         </connections>
                                     </button>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LEG-tr-OEq">
+                                        <rect key="frame" x="380" y="76" width="52" height="17"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Display" id="iAm-Et-uMj">
+                                            <font key="font" metaFont="systemBold"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="lA6-9K-Xs4" secondAttribute="bottom" constant="2" id="0Kk-Io-aom"/>
