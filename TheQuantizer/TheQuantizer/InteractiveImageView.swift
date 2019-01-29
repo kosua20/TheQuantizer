@@ -114,7 +114,9 @@ class InteractiveImageView: NSView {
 	}
 	
 	override func mouseDragged(with event: NSEvent) {
-		print(event.deltaX)
+		imageOffset.x = imageOffset.x+event.deltaX
+		imageOffset.y = imageOffset.y-event.deltaY
+		updateImageFrame()
 	}
 	
 	func updateImageFrame(){

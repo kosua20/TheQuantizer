@@ -1,9 +1,5 @@
 #  The Quantizer
 ## To do
-### Functionalities
-
-* click+drag to pan
-
 ### Technical
 
 * cleanup custom view
@@ -13,5 +9,5 @@
 * screenshots
 
 ### Later
-* investigate weird zoom
+* improve zooming and panning (center zoom, etc.)
 * add support for imageoptim
