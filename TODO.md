@@ -11,3 +11,4 @@
 ### Later
 * improve zooming and panning (center zoom, etc.)
 * add support for imageoptim
+* support import of any image type
