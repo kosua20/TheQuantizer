@@ -8,13 +8,66 @@
 
 import Cocoa
 
-
-
-
-class DocumentViewController: NSViewController, ImageLoaderDelegate {
+class DocumentViewController: NSViewController  {
 	
-	// Ui elements.
-	@IBOutlet weak var backgroundLabel: NSTextField!
+	/// Methods.
+	private var optionId = 0
+	@IBAction func methodMenuChanged(_ sender: NSPopUpButton) {
+		optionId = sender.selectedTag()
+		updateCompressedVersion()
+	}
+	
+	
+	/// Method settings.
+	private var colorsCount = 256
+	@IBOutlet weak var colorsLabel: NSTextField!
+	
+	@IBOutlet weak var colorsSlider: NSSlider!
+	@IBAction func colorsSliderChanged(_ sender: NSSlider) {
+		colorsCount = Int(round(pow(2, sender.doubleValue)))
+		colorsLabel.cell?.stringValue = "\(colorsCount)"
+		colorsStepper.integerValue = colorsCount
+		updateCompressedVersion()
+	}
+	
+	@IBOutlet weak var colorsStepper: NSStepper!
+	@IBAction func colorsStepperChanged(_ sender: NSStepper) {
+		colorsCount = sender.integerValue
+		colorsLabel.cell?.stringValue = "\(colorsCount)"
+		colorsSlider.doubleValue = log2(Double(colorsCount))
+		updateCompressedVersion()
+	}
+	
+	@IBOutlet weak var ditheredCheck: NSButton!
+	@IBAction func ditheredCheckChanged(_ sender: NSButton) {
+		updateCompressedVersion()
+	}
+	
+	@IBOutlet weak var noAlphaCheck: NSButton!
+	@IBAction func noAlphaChecked(_ sender: NSButton) {
+		updateCompressedVersion()
+	}
+	
+	
+	/// Display settings.
+	@IBOutlet weak var scaleLabel: NSTextField!
+	
+	@IBOutlet weak var scaleSlider: NSSlider!
+	@IBAction func scaleSliderChanged(_ sender: NSSlider) {
+		update(zoom: sender.doubleValue)
+	}
+	
+	@IBOutlet weak var scaleStepper: NSStepper!
+	@IBAction func scaleStepperChanged(_ sender: NSStepper) {
+		var currentValue = sender.doubleValue
+		// Are we increasing or decreasing.
+		if currentValue > scaleSlider.doubleValue {
+			currentValue = floor(scaleSlider.doubleValue + 1)
+		} else {
+			currentValue = ceil(scaleSlider.doubleValue - 1)
+		}
+		update(zoom: currentValue)
+	}
 	
 	@IBOutlet weak var showOriginalButton: NSButton!
 	@IBAction func showOriginal(_ sender: NSButton) {
@@ -27,128 +80,62 @@ class DocumentViewController: NSViewController, ImageLoaderDelegate {
 		
 	}
 	
-	// Colors
-	
-	@IBOutlet weak var colorsSlider: NSSlider!
-	@IBOutlet weak var colorsStepper: NSStepper!
-	@IBOutlet weak var colorsLabel: NSTextField!
-	@IBOutlet weak var ditheredCheck: NSButton!
-	private var colorsCount = 256
-	@IBAction func colorsSliderChanged(_ sender: NSSlider) {
-		colorsCount = Int(round(pow(2, sender.doubleValue)))
-		colorsLabel.cell?.stringValue = "\(colorsCount)"
-		colorsStepper.integerValue = colorsCount
-		updateCompressedVersion()
-	}
-	
-	@IBAction func colorsStepperChanged(_ sender: NSStepper) {
-		colorsCount = sender.integerValue
-		colorsLabel.cell?.stringValue = "\(colorsCount)"
-		colorsSlider.doubleValue = log2(Double(colorsCount))
-		updateCompressedVersion()
-	}
-	
-	@IBAction func ditheredCheckChanged(_ sender: NSButton) {
-		updateCompressedVersion()
-	}
-	
-	@IBOutlet weak var noAlphaCheck: NSButton!
-	@IBAction func noAlphaChecked(_ sender: NSButton) {
-		updateCompressedVersion()
-	}
-	// Algorithms.
-	private var optionId = 0
-	@IBAction func methodMenuChanged(_ sender: NSPopUpButton) {
-		optionId = sender.selectedTag()
-		updateCompressedVersion()
-	}
-	
-	// Display options.
-	
 	@IBOutlet weak var smoothingCheck: NSButton!
 	@IBAction func smoothingCheckChanged(_ sender: NSButton) {
 		imageView.smoothed = sender.state == .on
 	}
 	
-	@IBOutlet weak var scaleSlider: NSSlider!
-	@IBOutlet weak var scaleStepper: NSStepper!
-	@IBOutlet weak var scaleLabel: NSTextField!
 	
-	func update(zoom : Double){
-		let newZoom = min(max(zoom, 0.1), scaleSlider.maxValue)
-		scaleLabel.cell?.stringValue = newZoom.string(fractionDigits: 1) + "x"
-		scaleStepper.doubleValue = newZoom
-		scaleSlider.doubleValue = newZoom
-		imageView.imageZoom = newZoom
-	}
-	
-	@IBAction func scaleSliderChanged(_ sender: NSSlider) {
-		update(zoom: sender.doubleValue)
-	}
-	
-	@IBAction func scaleStepperChanged(_ sender: NSStepper) {
-		var currentValue = sender.doubleValue
-		// Are we increasing or decreasing.
-		if currentValue > scaleSlider.doubleValue {
-			currentValue = floor(scaleSlider.doubleValue + 1)
-		} else {
-			currentValue = ceil(scaleSlider.doubleValue - 1)
-		}
-		update(zoom: currentValue)
-	}
-	
-	
-	// Image view.
-	
-	
+	/// Image view and infos.
 	@IBOutlet weak var imageView: InteractiveImageView!
 	@IBOutlet weak var progressIndicator: NSProgressIndicator!
 	@IBOutlet weak var infoLabel: NSTextField!
-	
-	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		infoLabel.cell!.stringValue = "No image loaded."
-		let filter = NSEvent.EventTypeMask.leftMouseDown.union(.leftMouseUp)
-		showOriginalButton.cell!.sendAction(on: filter)
-		imageView.delegate = self
-	}
+	@IBOutlet weak var backgroundLabel: NSTextField!
 	
 	
 	private var document = ImageDocument()
+	private let semaphore = DispatchSemaphore(value: 1) //< Semaphore for processing threading.
 	
+	
+	/// View setup.
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		infoLabel.cell!.stringValue = "No image loaded."
+		imageView.delegate = self
+		// We need to register the showOriginal button as a "hold to show" button.
+		let filter = NSEvent.EventTypeMask.leftMouseDown.union(.leftMouseUp)
+		showOriginalButton.cell!.sendAction(on: filter)
+	}
 	
 	override func viewWillAppear() {
-		if let aDocument = self.view.window?.windowController?.document as? ImageDocument {
+		// if a document is available, display it.
+		if let aDocument = self.view.window?.windowController?.document as? ImageDocument, let originImage = aDocument.originalImage {
 			document = aDocument
-			
-			imageView.image = document.originalImage
-			if let _ = document.originalImage {
-				backgroundLabel.isHidden = true
-			}
+			imageView.image = originImage
+			backgroundLabel.isHidden = true
 			infoLabel.cell!.stringValue = document.displayName + ": \(document.originalSize) bytes"
 			updateCompressedVersion()
 		}
 	}
 	
-	func loadItem(at path: URL) {
-		NSDocumentController.shared.openDocument(withContentsOf: path, display: true, completionHandler: {_,_,_ in })
-	}
 	
-	
-	private let semaphore = DispatchSemaphore(value: 1)
-	
+	/// Compression process.
 	func updateCompressedVersion(){
+		
+		// Check if image available.
 		guard let originalImg = document.originalImage else {
 			return
 		}
 		
-		
+		// Gather settings.
 		let ditheringEnabled = ditheredCheck!.state == .on
 		let noAlphaEnabled = noAlphaCheck!.state == .on
 		
 		DispatchQueue.global(qos: .userInteractive ).async {
 			// Wait for the compressors to be available.
+			// The C libraries are using some global static state preventing us from running multiple instances in parallel (technically I solved this but let's be cautious).
+			// At the same time, we want to run the compression on a background thread as we need to update the progress indicator.
+			// So we use a semaphore to lock/unlock access to the compressors.
 			self.semaphore.wait()
 			
 			// Start animation.
@@ -156,21 +143,21 @@ class DocumentViewController: NSViewController, ImageLoaderDelegate {
 				self.progressIndicator.startAnimation(self)
 			}
 			
-			
-			
-			let w = Int(originalImg.size.width)
-			let h = Int(originalImg.size.height)
-			// Duplicate buffer.
+			// Duplicate buffer: some C algorithms will work in place.
+			let w = originalImg.representations.first?.pixelsWide ?? Int(originalImg.size.width)
+			let h = originalImg.representations.first?.pixelsHigh ?? Int(originalImg.size.height)
 			let bufferCopy = UnsafeMutablePointer<UInt8>.allocate(capacity: w*h*4)
 			for i in 0..<w*h {
 				let baseInd = 4*i
 				bufferCopy[baseInd+0] = self.document.originalData[baseInd+0]
 				bufferCopy[baseInd+1] = self.document.originalData[baseInd+1]
 				bufferCopy[baseInd+2] = self.document.originalData[baseInd+2]
+				// Remove alpha if needed.
 				bufferCopy[baseInd+3] = noAlphaEnabled ? 255 : self.document.originalData[baseInd+3]
 			}
 			
 			// Do the stuuuuff.
+			// It returns a compressed image containing the raw output PNG data and the file size.
 			var compressedImg : CompressedImage? = nil
 			switch self.optionId {
 			case 0:
@@ -180,31 +167,26 @@ class DocumentViewController: NSViewController, ImageLoaderDelegate {
 				compressedImg = PosterizerCompressor.compress(buffer: bufferCopy, w: w, h: h, colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
 			case 2:
-				compressedImg = PngQCompressor.compress(buffer: bufferCopy, w: w, h: h, colorCount: self.colorsCount, shouldDither: ditheringEnabled)
+				compressedImg = PngNQCompressor.compress(buffer: bufferCopy, w: w, h: h, colorCount: self.colorsCount, shouldDither: ditheringEnabled)
 				break
 			default:
 				break
 			}
-			
+			// We can free the copy now.
 			bufferCopy.deallocate()
 			
 			// If the compression succeeded
 			if let newImg = compressedImg {
 				
-				// Compute size gain, write file to disk.
+				// Compute size gain.
 				let pc = Int(round((Double(self.document.originalSize) - Double(newImg.size))/Double(self.document.originalSize) * 100))
 				
+				// Create data from the image.
 				let data = Data(bytes: newImg.data, count: newImg.size)
-				newImg.data.deallocate()
-				
-				let pathComponent = self.document.displayName + UUID().uuidString + ".png"
-				var tempPath = URL(fileURLWithPath: NSTemporaryDirectory())
-				tempPath.appendPathComponent(pathComponent)
-				try? data.write(to: tempPath)
-				self.document.newImage = NSImage(contentsOf: tempPath)
+				self.document.newImage =  NSImage(data: data)
 				self.document.newData = data
-				try? FileManager.default.removeItem(at: tempPath)
-				
+				// We don't need the initial data anymore.
+				newImg.data.deallocate()
 				
 				// Update GUI.
 				DispatchQueue.main.async {
@@ -221,12 +203,8 @@ class DocumentViewController: NSViewController, ImageLoaderDelegate {
 					self.semaphore.signal()
 				}
 			}
-			
-			
 		}
-		
 	}
-	
 
 	override var representedObject: Any? {
 		didSet {
@@ -234,6 +212,25 @@ class DocumentViewController: NSViewController, ImageLoaderDelegate {
 		}
 	}
 
-
 }
 
+/// Delegate to receive orders from the view.
+extension DocumentViewController : ImageLoaderDelegate {
+	
+	func loadItems(at paths: [URL]) {
+		for path in paths {
+		// Open a new tab/window with the new document.
+			NSDocumentController.shared.openDocument(withContentsOf: path, display: true, completionHandler: {_,_,_ in })
+		}
+	}
+	
+	func update(zoom : Double){
+		// Update the zoom value.
+		let newZoom = min(max(zoom, 0.1), scaleSlider.maxValue)
+		scaleLabel.cell?.stringValue = newZoom.string(fractionDigits: 1) + "x"
+		scaleStepper.doubleValue = newZoom
+		scaleSlider.doubleValue = newZoom
+		imageView.imageZoom = newZoom
+	}
+	
+}
