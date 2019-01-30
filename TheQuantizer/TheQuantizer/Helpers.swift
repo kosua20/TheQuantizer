@@ -38,11 +38,10 @@ class UnprocessedFileError : NSError {
 extension NSImage {
 	
 	func rgbaRepresentation() -> UnsafeMutablePointer<UInt8> {
-		//let baseImage = self.cgImage(forProposedRect: nil, context: nil, hints: [:])!
-		
-		
-		let width = Int(self.size.width)
-		let height = Int(self.size.height)
+		// Use a CG context to obtain raw RGBA image data.
+		// We have to be careful with the reported image size on retina screens.
+		let width = self.representations.first?.pixelsWide ?? Int(self.size.width)
+		let height = self.representations.first?.pixelsHigh ?? Int(self.size.height)
 		
 		let space = CGColorSpaceCreateDeviceRGB()
 		let rawData = UnsafeMutablePointer<UInt8>.allocate(capacity: 4 * height * width * MemoryLayout<UInt8>.size)
@@ -57,6 +56,7 @@ extension NSImage {
 		for y in 0..<height {
 			for x in 0..<width {
 				let rawCol = dataPtr[y*width+x]
+				// We de-multiply the alpha.
 				let alpha = Float((rawCol & 0xff000000) >> 24)/255.0
 				if alpha > 0 {
 					rawData[4*(y*width+x) + 0] = UInt8(Float((rawCol & 0x000000ff) >> 0 ) / alpha)
@@ -72,24 +72,12 @@ extension NSImage {
 				
 			}
 		}
-		
-		// De-alpha-premultiply.
-//		for i in 0..<height {
-//			for j in 0..<width {
-//				let baseIndex = 4*(width*i+j)
-//				let alpha = Float(rawData[baseIndex + 3])/255.0
-//				if alpha > 0 {
-//					rawData[baseIndex + 0] = UInt8(Float(rawData[baseIndex + 0]) / alpha)
-//					rawData[baseIndex + 1] = UInt8(Float(rawData[baseIndex + 1]) / alpha)
-//					rawData[baseIndex + 2] = UInt8(Float(rawData[baseIndex + 2]) / alpha)
-//				}
-//			}
-//		}
 		return rawData
 	}
 }
 
 extension Double {
+	
 	func string(fractionDigits:Int) -> String {
 		let formatter = NumberFormatter()
 		formatter.minimumFractionDigits = 0
@@ -99,6 +87,7 @@ extension Double {
 	}
 }
 
+// The palette is a liq_color[256] array in C, converted to a 256-elements tuple in swift. Urgh.
 func populatePalette(palette: liq_palette) -> [liq_color] {
 	var palcol : [liq_color] = Array<liq_color>(repeating: liq_color(r: 0, g: 0, b: 0, a: 0), count: 256)
 	palcol[0] = palette.entries.0
